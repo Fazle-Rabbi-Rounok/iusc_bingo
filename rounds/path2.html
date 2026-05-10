@@ -154,8 +154,8 @@
         { icon: "↖", dx: -1, dy: -1 },
       ];
 
-     const start = { x: 0, y: 2 };
-const end = { x: 4, y: 0 };
+      const start = { x: 0, y: 2 };
+      const end = { x: 4, y: 0 };
       /*
     Correct full path idea:
     Down column 1,
@@ -174,13 +174,13 @@ const end = { x: 4, y: 0 };
     Some arrows are fixed to guide the snake-like route.
   */
 
-const initialGrid = [
-  [0, "F4", 0, "F3", "E"],
-  ["F0", 0, 0, 0, "F4"],
-  ["S0", 0, 0, "F0", 0],
-  [0, 0, "F7", 0, 0],
-  ["F0", 0, 0, 0, "F6"]
-];
+      const initialGrid = [
+        [0, "F4", 0, "F3", "E"],
+        ["F0", 0, 0, 0, "F4"],
+        ["S0", 0, 0, "F0", 0],
+        [0, 0, "F7", 0, 0],
+        ["F0", 0, 0, 0, "F6"],
+      ];
 
       let grid = [];
       let running = false;
