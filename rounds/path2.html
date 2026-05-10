@@ -113,16 +113,15 @@
   }
 
   .next-btn {
-    display: none;
-    margin-top: 18px;
-    padding: 13px 24px;
-    border-radius: 999px;
-    background: #22c55e;
-    color: #020617;
-    font-weight: 900;
-    text-decoration: none;
-    display: inline-block;
-  }
+  display: none;
+  margin-top: 18px;
+  padding: 13px 24px;
+  border-radius: 999px;
+  background: #22c55e;
+  color: #020617;
+  font-weight: 900;
+  text-decoration: none;
+}
 </style>
 </head>
 
@@ -168,8 +167,38 @@
   <button class="reset-btn" onclick="resetGame()">Reset</button>
 
   <div class="message" id="message"></div>
+<div style="
+  margin-top:24px;
+  padding:16px;
+  background:#020617;
+  border:1px solid #334155;
+  border-radius:14px;
+">
 
-  <a id="nextBtn" href="mirror1.html" class="next-btn" style="display:none;">
+  <p>
+    Emergency escape
+  </p>
+
+  <input
+    type="text"
+    id="escapeInput"
+    placeholder="Emergency Password"
+    style="
+      padding:12px;
+      width:220px;
+      border:none;
+      border-radius:8px;
+      text-align:center;
+      margin-right:8px;
+    "
+  >
+
+  <button onclick="emergencyEscape()">
+    Unlock
+  </button>
+
+</div>
+  <a id="nextBtn" href="mirror_title.html" class="next-btn" style="display:none;">
     NEXT GAME
   </a>
 
@@ -303,7 +332,7 @@
           message.className = "message success";
 
           message.innerHTML =
-            'Correct. Password unlocked: <strong>"Be"</strong>';
+            'Correct. Password unlocked: <strong>Be</strong>';
 
           localStorage.setItem(
             "scienceBingo_path2_password",
@@ -370,7 +399,37 @@
 
     render();
   }
+function emergencyEscape() {
 
+  const input =
+    document.getElementById("escapeInput")
+      .value
+      .trim()
+      .toLowerCase();
+
+  if (input === "direction") {
+
+    localStorage.setItem(
+      "scienceBingo_path2_password",
+      "Be"
+    );
+
+    message.className = "message success";
+
+    message.innerHTML =
+      'Emergency unlock accepted. Password revealed: <strong>Be</strong>';
+
+    nextBtn.style.display =
+      "inline-block";
+
+  } else {
+
+    message.className = "message danger";
+
+    message.textContent =
+      "Incorrect emergency password.";
+  }
+}
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }

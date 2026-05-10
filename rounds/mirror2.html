@@ -2,21 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mirror Calendar Draft</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mirror Calendar</title>
+
+  <link rel="stylesheet" href="../css/style.css">
 
   <style>
     body {
       margin: 0;
+      padding: 0;
       font-family: Arial, sans-serif;
-      background: #111827;
       color: white;
       text-align: center;
-      padding: 20px;
     }
 
     .box {
       max-width: 900px;
-      margin: auto;
+      margin: 40px auto;
       background: #1f2937;
       padding: 20px;
       border-radius: 14px;
@@ -28,7 +30,7 @@
 
     .instructions {
       color: #d1d5db;
-      line-height: 1.6;
+      line-height: 1.7;
       margin-bottom: 20px;
     }
 
@@ -57,7 +59,7 @@
       font-weight: bold;
       color: #facc15;
       margin-bottom: 15px;
-        transform: scaleX(-1);
+      transform: scaleX(-1);
     }
 
     .weekdays,
@@ -101,16 +103,6 @@
       box-shadow: 0 0 20px rgba(250, 204, 21, 0.35);
     }
 
-    .highlight::after {
-      content: "MARKED";
-      position: absolute;
-      bottom: 4px;
-      right: 5px;
-      font-size: 0.55rem;
-      color: #020617;
-      opacity: 0.75;
-    }
-
     .penalty-overlay {
       display: none;
       position: absolute;
@@ -138,8 +130,16 @@
       font-size: 1.2rem;
     }
 
-    .answer-area {
+    .answer-area,
+    .escape-area {
       margin-top: 25px;
+    }
+
+    .escape-area {
+      background: #020617;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 16px;
     }
 
     select,
@@ -153,7 +153,7 @@
     }
 
     input {
-      width: 120px;
+      width: 150px;
     }
 
     button {
@@ -165,10 +165,6 @@
       font-weight: bold;
       cursor: pointer;
       margin-top: 10px;
-    }
-
-    button:hover {
-      background: #67e8f9;
     }
 
     button:disabled {
@@ -183,23 +179,27 @@
       font-size: 1.05rem;
     }
 
-    @media (max-width: 600px) {
-      body {
-        padding: 10px;
-      }
+    .next-btn {
+      display: none;
+      margin-top: 18px;
+      padding: 13px 24px;
+      border-radius: 999px;
+      background: #22c55e;
+      color: #020617;
+      font-weight: 900;
+      text-decoration: none;
+    }
 
+    @media (max-width: 600px) {
       .box {
         padding: 14px;
+        margin: 30px 10px;
       }
 
       .day-name,
       .date-cell {
         min-height: 42px;
         font-size: 0.85rem;
-      }
-
-      .month-title {
-        
       }
 
       .calendar {
@@ -210,253 +210,266 @@
       .dates {
         gap: 5px;
       }
-      
     }
   </style>
 </head>
 
 <body>
-  <div class="box">
-    <h1>Mirror Calendar</h1>
 
-   <p class="instructions">
-  The calendar below has been mirrored both vertically and horizontally.<br>
-  One position is marked on the mirrored calendar.<br>
-  If the calendar was restored to normal, what date and day would appear at that same marked box?
-  <br><br>
-  Wrong answer penalty: 30 seconds.
-</p>
-
-    <div class="calendar-wrap" id="calendarWrap">
-      <div class="calendar">
-        <div class="month-title">MIRRORED CALENDAR: SEPTEMBER 1966</div>
-
-        <div class="weekdays" id="weekdaysGrid"></div>
-        <div class="dates" id="datesGrid"></div>
-      </div>
-
-      <div class="penalty-overlay">
-        <h2>Wrong Answer</h2>
-        <p>Board locked for <span id="penaltyCount">30</span>s</p>
-      </div>
+<header class="site-header">
+  <div class="brand">
+    <div class="mini-logo">
+      <img src="../assets/game_logo.png" alt="IUSC Logo">
     </div>
 
-    <div class="answer-area">
-      <p>Enter the date and day that would appear here after mirroring:</p>
-
-      <input type="number" id="dateInput" placeholder="Date" min="1" max="31">
-
-      <select id="dayInput">
-        <option value="">Select Day</option>
-        <option value="Sunday">Sunday</option>
-        <option value="Monday">Monday</option>
-        <option value="Tuesday">Tuesday</option>
-        <option value="Wednesday">Wednesday</option>
-        <option value="Thursday">Thursday</option>
-        <option value="Friday">Friday</option>
-        <option value="Saturday">Saturday</option>
-      </select>
-
-      <br>
-
-      <button id="submitBtn" onclick="checkAnswer()">Submit</button>
-
-      <div class="message" id="message"></div>
+    <div class="brand-text">
+      <small>Pubali Bank presents</small>
+      <strong>2nd IUSC National Science Fest 2026</strong>
     </div>
   </div>
 
-  <script>
-    const weekdaysGrid = document.getElementById("weekdaysGrid");
-    const datesGrid = document.getElementById("datesGrid");
-    const calendarWrap = document.getElementById("calendarWrap");
-    const penaltyCount = document.getElementById("penaltyCount");
-    const submitBtn = document.getElementById("submitBtn");
-    const message = document.getElementById("message");
+  <div class="header-badge">
+    Science Bingo
+  </div>
+</header>
 
-    const normalWeekdays = [
-  "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"
-];
+<div class="box">
 
-const monthDays = 30;
-const totalCols = 7;
-const startBlankCells = 4;
+  <h1>Mirror Calendar</h1>
 
-/*
-  September 1966 starts on Thursday and has 30 days.
+  <p class="instructions">
+    The calendar title and the weekday bar are mirrored horizontally.<br>
+    The date grid, from 1 to 30, has been mirrored both vertically and horizontally.<br><br>
 
-  Normal calendar:
+    One position is highlighted on the mirrored calendar.<br>
+    If the date grid was restored to normal, what date and day would appear at that same marked box?<br><br>
 
-  SUN MON TUE WED THU FRI SAT
-                   1   2   3
-   4   5   6   7   8   9  10
-  11  12  13  14  15  16  17
-  18  19  20  21  22  23  24
-  25  26  27  28  29  30
+    Wrong answer penalty: 30 seconds.
+  </p>
 
-  Mirrored vertically + horizontally:
-  - rows are reversed
-  - columns are reversed
+  <div class="calendar-wrap" id="calendarWrap">
+    <div class="calendar">
+      <div class="month-title">MIRRORED CALENDAR: SEPTEMBER 1966</div>
 
-  Marked position on MIRRORED calendar:
-  5th row, 4th column
+      <div class="weekdays" id="weekdaysGrid"></div>
+      <div class="dates" id="datesGrid"></div>
+    </div>
 
-  In zero-based JS:
-  row = 4
-  col = 3
+    <div class="penalty-overlay">
+      <h2>Wrong Answer</h2>
+      <p>Board locked for <span id="penaltyCount">30</span>s</p>
+    </div>
+  </div>
 
-  Same marked position after restoring to NORMAL calendar:
-  normal row = 5 - 1 - 4 = 0
-  normal col = 7 - 1 - 3 = 3
+  <div class="answer-area">
+    <p>Enter the date and day that would appear after restoring the calendar:</p>
 
-  Normal row 0, col 3 = blank.
+    <input type="number" id="dateInput" placeholder="Date" min="1" max="31">
 
-  Since blank is not useful, we include the weekday row in the mirror logic.
-  Weekday column 3 remains WED after horizontal symmetry.
+    <select id="dayInput">
+      <option value="">Select Day</option>
+      <option value="Sunday">Sunday</option>
+      <option value="Monday">Monday</option>
+      <option value="Tuesday">Tuesday</option>
+      <option value="Wednesday">Wednesday</option>
+      <option value="Thursday">Thursday</option>
+      <option value="Friday">Friday</option>
+      <option value="Saturday">Saturday</option>
+    </select>
 
-  Better practical answer target:
-  marked mirrored row 4, col 3 maps to normal row 0, col 3 = blank.
-  
-  So the position is intentionally tricky: the answer is EMPTY / Wednesday.
-*/
+    <br>
 
-const markedRow = 4;
+    <button id="submitBtn" onclick="checkAnswer()">Submit</button>
+
+    <div class="message" id="message"></div>
+
+    <a id="nextBtn" href="mirror3.html" class="next-btn">
+      NEXT GAME
+    </a>
+  </div>
+
+  <div class="escape-area">
+    <p>
+      Emergency escape<br>
+    </p>
+
+    <input type="text" id="escapeInput" placeholder="Emergency Password">
+    <button onclick="emergencyEscape()">Unlock</button>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <span>
+    Science Bingo | 2nd IUSC National Science Fest 2026
+  </span>
+</footer>
+
+<script>
+  const weekdaysGrid = document.getElementById("weekdaysGrid");
+  const datesGrid = document.getElementById("datesGrid");
+  const calendarWrap = document.getElementById("calendarWrap");
+  const penaltyCount = document.getElementById("penaltyCount");
+  const submitBtn = document.getElementById("submitBtn");
+  const message = document.getElementById("message");
+  const nextBtn = document.getElementById("nextBtn");
+
+  const emergencyPassword = "mir2";
+
+  const normalWeekdays = [
+    "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"
+  ];
+
+  const monthDays = 30;
+  const totalCols = 7;
+  const startBlankCells = 4;
+
+  const markedRow = 4;
 const markedCol = 2;
 
-const correctDate = 27;
-const correctDay = "Tuesday";
+  const correctDate = 27;
+  const correctDay = "Tuesday";
 
-    let penaltyRunning = false;
+  let penaltyRunning = false;
 
-   function buildNormalCalendarRows() {
-  const cells = [];
+  function buildNormalCalendarRows() {
+    const cells = [];
 
-  for (let i = 0; i < startBlankCells; i++) {
-    cells.push(null);
-  }
-
-  for (let d = 1; d <= monthDays; d++) {
-    cells.push(d);
-  }
-
-  while (cells.length % totalCols !== 0) {
-    cells.push(null);
-  }
-
-  const rows = [];
-
-  for (let i = 0; i < cells.length; i += totalCols) {
-    rows.push(cells.slice(i, i + totalCols));
-  }
-
-  return rows;
-}
-
-    function buildCalendar() {
-  weekdaysGrid.innerHTML = "";
-  datesGrid.innerHTML = "";
-
-  /*
-    Mirror weekday row horizontally
-  */
-  /*
-  Keep weekday names normal.
-  Only the date grid is mirrored.
-*/
-const mirroredWeekdays = [...normalWeekdays].reverse();
-
-mirroredWeekdays.forEach(day => {
-  const cell = document.createElement("div");
-  cell.className = "day-name";
-  cell.textContent = day;
-  weekdaysGrid.appendChild(cell);
-});
-
-  const normalRows = buildNormalCalendarRows();
-
-  /*
-    Apply BOTH mirrors:
-    1. Horizontal mirror → reverse each row
-    2. Vertical mirror → reverse row order
-  */
-  const mirroredRows = normalRows
-    .map(row => [...row].reverse())
-    .reverse();
-
-  mirroredRows.forEach((row, rowIndex) => {
-    row.forEach((value, colIndex) => {
-
-      const cell = document.createElement("div");
-      cell.classList.add("date-cell");
-
-      if (value === null) {
-        cell.classList.add("empty");
-        cell.textContent = "";
-      } else {
-        cell.textContent = value;
-      }
-
-      /*
-        Mark visible mirrored position:
-        5th row, 4th column
-      */
-      if (
-        rowIndex === markedRow &&
-        colIndex === markedCol
-      ) {
-        cell.classList.add("highlight");
-      }
-
-      datesGrid.appendChild(cell);
-    });
-  });
-}
-
-    function checkAnswer() {
-      if (penaltyRunning) return;
-
-      const dateValue = Number(document.getElementById("dateInput").value);
-      const dayValue = document.getElementById("dayInput").value;
-
-      if (dateValue === correctDate && dayValue === correctDay) {
-        message.style.color = "#22c55e";
-        message.innerHTML = "Correct. Secret digit unlocked: <strong>4</strong>";
-        submitBtn.disabled = true;
-        return;
-      }
-
-      startPenalty();
+    for (let i = 0; i < startBlankCells; i++) {
+      cells.push(null);
     }
 
-    function startPenalty() {
-      let timeLeft = 30;
-      penaltyRunning = true;
+    for (let d = 1; d <= monthDays; d++) {
+      cells.push(d);
+    }
 
-      calendarWrap.classList.add("locked");
-      submitBtn.disabled = true;
+    while (cells.length % totalCols !== 0) {
+      cells.push(null);
+    }
 
+    const rows = [];
+
+    for (let i = 0; i < cells.length; i += totalCols) {
+      rows.push(cells.slice(i, i + totalCols));
+    }
+
+    return rows;
+  }
+
+  function buildCalendar() {
+    weekdaysGrid.innerHTML = "";
+    datesGrid.innerHTML = "";
+
+    const mirroredWeekdays = [...normalWeekdays].reverse();
+
+    mirroredWeekdays.forEach(day => {
+      const cell = document.createElement("div");
+      cell.className = "day-name";
+      cell.textContent = day;
+      weekdaysGrid.appendChild(cell);
+    });
+
+    const normalRows = buildNormalCalendarRows();
+
+    const mirroredRows = normalRows
+      .map(row => [...row].reverse())
+      .reverse();
+
+    mirroredRows.forEach((row, rowIndex) => {
+      row.forEach((value, colIndex) => {
+        const cell = document.createElement("div");
+        cell.classList.add("date-cell");
+
+        if (value === null) {
+          cell.classList.add("empty");
+          cell.textContent = "";
+        } else {
+          cell.textContent = value;
+        }
+
+        if (rowIndex === markedRow && colIndex === markedCol) {
+          cell.classList.add("highlight");
+        }
+
+        datesGrid.appendChild(cell);
+      });
+    });
+  }
+
+  function completeGame(text) {
+    localStorage.setItem("scienceBingo_mirror2_completed", "true");
+
+    message.style.color = "#22c55e";
+    message.innerHTML = text;
+
+    submitBtn.disabled = true;
+    nextBtn.style.display = "inline-block";
+  }
+
+  function checkAnswer() {
+    if (penaltyRunning) return;
+
+    const dateValue = Number(document.getElementById("dateInput").value);
+    const dayValue = document.getElementById("dayInput").value;
+
+    if (dateValue === correctDate && dayValue === correctDay) {
+      completeGame("Correct. Calendar restored successfully.");
+      return;
+    }
+
+    startPenalty();
+  }
+
+  function emergencyEscape() {
+    const input = document
+      .getElementById("escapeInput")
+      .value
+      .trim()
+      .toLowerCase();
+
+    if (input === emergencyPassword) {
+      completeGame("Emergency unlock accepted. Continue to the next game.");
+    } else {
       message.style.color = "#f87171";
-      message.textContent = "Wrong answer. Wait for the board to unlock.";
+      message.textContent = "Incorrect emergency password.";
+    }
+  }
 
+  function startPenalty() {
+    let timeLeft = 30;
+    penaltyRunning = true;
+
+    calendarWrap.classList.add("locked");
+    submitBtn.disabled = true;
+
+    message.style.color = "#f87171";
+    message.textContent = "Wrong answer. Wait for the board to unlock.";
+
+    penaltyCount.textContent = timeLeft;
+
+    const interval = setInterval(() => {
+      timeLeft--;
       penaltyCount.textContent = timeLeft;
 
-      const interval = setInterval(() => {
-        timeLeft--;
-        penaltyCount.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(interval);
 
-        if (timeLeft <= 0) {
-          clearInterval(interval);
+        penaltyRunning = false;
+        calendarWrap.classList.remove("locked");
+        submitBtn.disabled = false;
 
-          penaltyRunning = false;
-          calendarWrap.classList.remove("locked");
-          submitBtn.disabled = false;
+        message.style.color = "#d1d5db";
+        message.textContent = "Board unlocked. Try again.";
+      }
+    }, 1000);
+  }
 
-          message.style.color = "#d1d5db";
-          message.textContent = "Board unlocked. Try again.";
-        }
-      }, 1000);
-    }
+  if (localStorage.getItem("scienceBingo_mirror2_completed") === "true") {
+    nextBtn.style.display = "inline-block";
+  }
 
-    buildCalendar();
-  </script>
+  buildCalendar();
+</script>
+
 </body>
 </html>

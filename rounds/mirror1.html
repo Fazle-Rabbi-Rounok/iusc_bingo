@@ -2,21 +2,24 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Mirror Clock Puzzle</title>
+
+<link rel="stylesheet" href="../css/style.css">
 
 <style>
   body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #111827;
-    color: white;
-    padding: 20px;
-    text-align: center;
-  }
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  color: white;
+  text-align: center;
+}
 
   .game {
     max-width: 760px;
-    margin: auto;
+    margin: 40px auto;
     background: #1f2937;
     border-radius: 18px;
     padding: 22px;
@@ -86,6 +89,17 @@
     color: #f87171;
   }
 
+  .next-btn {
+  display: none;
+  margin-top: 18px;
+  padding: 13px 24px;
+  border-radius: 999px;
+  background: #22c55e;
+  color: #020617;
+  font-weight: 900;
+  text-decoration: none;
+}
+
   @media (max-width: 600px) {
     button {
       margin-left: 0;
@@ -98,17 +112,42 @@
 
 <body>
 
+<header class="site-header">
+
+  <div class="brand">
+
+    <div class="mini-logo">
+      <img src="../assets/game_logo.png" alt="IUSC Logo">
+    </div>
+
+    <div class="brand-text">
+      <small>Pubali Bank presents</small>
+      <strong>2nd IUSC National Science Fest 2026</strong>
+    </div>
+
+  </div>
+
+  <div class="header-badge">
+    Science Bingo
+  </div>
+
+</header>
+
 <div class="game">
-  <h1>Mirror Clock Puzzle</h1>
+
+  <h1>Mirror Clock</h1>
 
   <p class="instructions">
     The analog clock below is seen through a mirror.<br>
-    First mentally restore the real clock, then calculate the smaller angle between the hour hand and minute hand.
+    First restore the real clock, then calculate the smaller angle between the hour hand and minute hand.
   </p>
 
   <div class="clock-box">
     <canvas id="clockCanvas" width="320" height="320"></canvas>
-    <div class="note">This is the mirrored clock view.</div>
+
+    <div class="note">
+      This is the mirrored clock view.
+    </div>
   </div>
 
   <p>Enter the smaller angle in degrees:</p>
@@ -118,52 +157,78 @@
   <button onclick="checkAnswer()">Submit</button>
 
   <div class="message" id="message"></div>
+<div style="
+  margin-top:24px;
+  padding:16px;
+  background:#020617;
+  border:1px solid #334155;
+  border-radius:14px;
+">
+
+  <p>
+    Emergency escape
+  </p>
+
+  <input
+    type="text"
+    id="escapeInput"
+    placeholder="Emergency Password"
+  >
+
+  <button onclick="emergencyEscape()">
+    Unlock
+  </button>
+
 </div>
+  <a id="nextBtn" href="mirror2.html" class="next-btn" style="display:none;">
+    Let's go
+  </a>
+
+</div>
+
+<footer class="site-footer">
+
+  <span>
+    Science Bingo | 2nd IUSC National Science Fest 2026
+  </span>
+
+</footer>
 
 <script>
   const canvas = document.getElementById("clockCanvas");
   const ctx = canvas.getContext("2d");
 
-  /*
-    Real clock time: 4:50
-    Mirrored clock view will look like 7:10.
-    
-    Real angle:
-    Hour hand at 4:50 = 4*30 + 50*0.5 = 145°
-    Minute hand at 50 = 50*6 = 300°
-    Difference = 155°
-    Smaller angle = 155°
-  */
-
   const realHour = 2;
-const realMinute = 20;
-const correctAngle = 50;
+  const realMinute = 20;
+
+  const correctAngle = 50;
 
   function drawClock() {
+
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
+
     const radius = 140;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     ctx.save();
 
-    /*
-      Mirror effect:
-      horizontally flip the whole clock.
-    */
     ctx.translate(canvas.width, 0);
     ctx.scale(-1, 1);
 
     drawClockFace(cx, cy, radius);
+
     drawHands(cx, cy, radius, realHour, realMinute);
 
     ctx.restore();
   }
 
   function drawClockFace(cx, cy, radius) {
+
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+
     ctx.fillStyle = "#020617";
     ctx.fill();
 
@@ -171,63 +236,156 @@ const correctAngle = 50;
     ctx.lineWidth = 4;
     ctx.stroke();
 
-    
-
     for (let i = 0; i < 60; i++) {
+
       const angle = (i * 6 - 90) * Math.PI / 180;
+
       const outerX = cx + Math.cos(angle) * (radius - 8);
       const outerY = cy + Math.sin(angle) * (radius - 8);
-      const innerX = cx + Math.cos(angle) * (radius - (i % 5 === 0 ? 18 : 12));
-      const innerY = cy + Math.sin(angle) * (radius - (i % 5 === 0 ? 18 : 12));
 
-      ctx.strokeStyle = i % 5 === 0 ? "#cbd5e1" : "#64748b";
+      const innerX =
+        cx + Math.cos(angle) *
+        (radius - (i % 5 === 0 ? 18 : 12));
+
+      const innerY =
+        cy + Math.sin(angle) *
+        (radius - (i % 5 === 0 ? 18 : 12));
+
+      ctx.strokeStyle =
+        i % 5 === 0 ? "#cbd5e1" : "#64748b";
+
       ctx.lineWidth = i % 5 === 0 ? 2 : 1;
 
       ctx.beginPath();
+
       ctx.moveTo(innerX, innerY);
       ctx.lineTo(outerX, outerY);
+
       ctx.stroke();
     }
   }
 
   function drawHands(cx, cy, radius, hour, minute) {
-    const hourAngle = ((hour % 12) * 30 + minute * 0.5 - 90) * Math.PI / 180;
-    const minuteAngle = (minute * 6 - 90) * Math.PI / 180;
 
-    drawHand(cx, cy, hourAngle, radius * 0.48, 7, "#facc15");
-    drawHand(cx, cy, minuteAngle, radius * 0.72, 5, "#38bdf8");
+    const hourAngle =
+      ((hour % 12) * 30 + minute * 0.5 - 90)
+      * Math.PI / 180;
+
+    const minuteAngle =
+      (minute * 6 - 90)
+      * Math.PI / 180;
+
+    drawHand(
+      cx,
+      cy,
+      hourAngle,
+      radius * 0.48,
+      7,
+      "#facc15"
+    );
+
+    drawHand(
+      cx,
+      cy,
+      minuteAngle,
+      radius * 0.72,
+      5,
+      "#38bdf8"
+    );
 
     ctx.beginPath();
     ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+
     ctx.fillStyle = "#f8fafc";
     ctx.fill();
   }
 
   function drawHand(cx, cy, angle, length, width, color) {
+
     ctx.strokeStyle = color;
     ctx.lineWidth = width;
     ctx.lineCap = "round";
 
     ctx.beginPath();
+
     ctx.moveTo(cx, cy);
+
     ctx.lineTo(
       cx + Math.cos(angle) * length,
       cy + Math.sin(angle) * length
     );
+
     ctx.stroke();
   }
 
   function checkAnswer() {
-    const input = Number(document.getElementById("answerInput").value);
-    const message = document.getElementById("message");
+
+    const input =
+      Number(document.getElementById("answerInput").value);
+
+    const message =
+      document.getElementById("message");
 
     if (input === correctAngle) {
+
       message.className = "message success";
-      message.innerHTML = "Correct. Secret digit unlocked: <strong>9</strong>";
+
+      message.innerHTML =
+  "Correct. The mirrored clock was restored.";
+
+localStorage.setItem(
+  "scienceBingo_mirror1_completed",
+  "true"
+);
+
+      document.getElementById("nextBtn")
+  .style.display = "inline-block";
+
     } else {
+
       message.className = "message danger";
-      message.textContent = "Incorrect. Restore the real clock first, then calculate the smaller angle.";
+
+      message.textContent =
+        "Incorrect. Restore the real clock first, then calculate the smaller angle.";
     }
+  }
+function emergencyEscape() {
+
+  const input =
+    document.getElementById("escapeInput")
+      .value
+      .trim()
+      .toLowerCase();
+
+  if (input === "clock") {
+
+    localStorage.setItem(
+      "scienceBingo_mirror1_completed",
+      "true"
+    );
+
+    message.className = "message success";
+
+    message.innerHTML =
+      "Emergency unlock accepted.";
+
+    document.getElementById("nextBtn")
+      .style.display = "inline-block";
+
+  } else {
+
+    message.className = "message danger";
+
+    message.textContent =
+      "Incorrect emergency password.";
+  }
+}
+  if (
+    localStorage.getItem("scienceBingo_mirror1_completed")
+  ) {
+
+    document.getElementById("nextBtn")
+      .style.display = "inline-block";
   }
 
   drawClock();

@@ -139,7 +139,37 @@
     </p>
 
     <div class="message" id="message"></div>
+<div style="
+  margin-top:24px;
+  padding:16px;
+  background:#020617;
+  border:1px solid #334155;
+  border-radius:14px;
+">
 
+  <p>
+    Emergency escape
+  </p>
+
+  <input
+    type="text"
+    id="escapeInput"
+    placeholder="Emergency Password"
+    style="
+      padding:12px;
+      width:220px;
+      border:none;
+      border-radius:8px;
+      text-align:center;
+      margin-right:8px;
+    "
+  >
+
+  <button onclick="emergencyEscape()">
+    Unlock
+  </button>
+
+</div>
     <a id="nextGameBtn" href="path2.html" class="next-btn">
      Let's Go
     </a>
@@ -496,7 +526,39 @@
         }
       }, 2000);
     }
+function emergencyEscape() {
 
+  const input =
+    document.getElementById("escapeInput")
+      .value
+      .trim()
+      .toLowerCase();
+
+  if (input === "beam") {
+
+    solvedAlready = true;
+
+    localStorage.setItem(
+      "scienceBingo_path1_completed",
+      "true"
+    );
+
+    message.style.color = "#22c55e";
+
+    message.innerHTML =
+      "Emergency unlock accepted.";
+
+    nextGameBtn.style.display =
+      "inline-block";
+
+  } else {
+
+    message.style.color = "#f87171";
+
+    message.textContent =
+      "Incorrect emergency password.";
+  }
+}
     if (localStorage.getItem("scienceBingo_path1_completed") === "true") {
       nextGameBtn.style.display = "inline-block";
     }
