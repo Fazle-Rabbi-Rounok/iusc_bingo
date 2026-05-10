@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Reflection Laser Draft</title>
-
+  <title>Reflection Laser Puzzle</title>
+<link rel="stylesheet" href="../css/style.css">
   <style>
     body {
       margin: 0;
@@ -11,16 +11,16 @@
       background: #111827;
       color: white;
       text-align: center;
-      padding: 20px;
+      padding: 0px;
     }
 
     .box {
-      max-width: 950px;
-      margin: auto;
-      background: #1f2937;
-      padding: 20px;
-      border-radius: 14px;
-    }
+  max-width: 950px;
+  margin: 40px auto;
+  background: #1f2937;
+  padding: 20px;
+  border-radius: 14px;
+}
 
     h1 {
       color: #38bdf8;
@@ -72,6 +72,17 @@
       margin-top: 10px;
     }
 
+    .next-btn {
+      display: none;
+      margin-top: 18px;
+      padding: 13px 24px;
+      border-radius: 999px;
+      background: #22c55e;
+      color: #020617;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
     .shake {
       animation: shakeBoard 0.35s;
     }
@@ -88,8 +99,28 @@
 </head>
 
 <body>
+  <header class="site-header">
+
+  <div class="brand">
+
+    <div class="mini-logo">
+      <img src="../assets/game_logo.png" alt="IUSC Logo">
+    </div>
+
+    <div class="brand-text">
+      <small>Pubali Bank presents</small>
+      <strong>2nd IUSC National Science Fest 2026</strong>
+    </div>
+
+  </div>
+
+  <div class="header-badge">
+    Science Bingo
+  </div>
+
+</header>
   <div class="box">
-    <h1>Reflection Laser Puzzle</h1>
+    <h1>Reflection Laser</h1>
 
     <p class="instructions">
       Rotate the mirrors so the hidden laser reaches the yellow target.<br>
@@ -108,12 +139,17 @@
     </p>
 
     <div class="message" id="message"></div>
+
+    <a id="nextGameBtn" href="path2.html" class="next-btn">
+     Let's Go
+    </a>
   </div>
 
   <script>
     const canvas = document.getElementById("laserCanvas");
     const ctx = canvas.getContext("2d");
     const message = document.getElementById("message");
+    const nextGameBtn = document.getElementById("nextGameBtn");
 
     const gridSize = 40;
     const cols = 19;
@@ -162,48 +198,41 @@
     ];
 
     let mirrors = [
-      /* correct route, scrambled */
-      { x: 4, y: 11, type: "\\" },  // correct: /
-      { x: 4, y: 8, type: "\\" },   // correct: /
-      { x: 8, y: 8, type: "/" },    // correct: \
-      { x: 8, y: 12, type: "/" },   // correct: \
-      { x: 10, y: 12, type: "\\" }, // correct: /
-      { x: 10, y: 7, type: "\\" },  // correct: /
-      { x: 14, y: 7, type: "/" },   // correct: \
-      { x: 14, y: 10, type: "/" },  // correct: \
-      { x: 18, y: 10, type: "\\" }, // correct: /
-      { x: 18, y: 3, type: "/" },   // correct: \
-      { x: 16, y: 3, type: "/" },   // correct: \
-      { x: 16, y: 2, type: "\\" },  // correct: /
+      { x: 4, y: 11, type: "\\" },
+      { x: 4, y: 8, type: "\\" },
+      { x: 8, y: 8, type: "/" },
+      { x: 8, y: 12, type: "/" },
+      { x: 10, y: 12, type: "\\" },
+      { x: 10, y: 7, type: "\\" },
+      { x: 14, y: 7, type: "/" },
+      { x: 14, y: 10, type: "/" },
+      { x: 18, y: 10, type: "\\" },
+      { x: 18, y: 3, type: "/" },
+      { x: 16, y: 3, type: "/" },
+      { x: 16, y: 2, type: "\\" },
 
-      /* decoy route A */
       { x: 4, y: 12, type: "/" },
       { x: 2, y: 9, type: "/" },
       { x: 6, y: 9, type: "\\" },
 
-      /* decoy route B */
       { x: 4, y: 5, type: "\\" },
       { x: 7, y: 5, type: "/" },
       { x: 7, y: 2, type: "\\" },
 
-      /* decoy route C */
       { x: 10, y: 5, type: "/" },
       { x: 13, y: 5, type: "\\" },
       { x: 13, y: 8, type: "/" },
       { x: 16, y: 8, type: "\\" },
 
-      /* near-target decoys */
       { x: 15, y: 3, type: "/" },
       { x: 17, y: 4, type: "\\" },
       { x: 16, y: 5, type: "/" },
 
-      /* added mirrors from green marks */
       { x: 1, y: 4, type: "/" },
       { x: 1, y: 8, type: "/" },
       { x: 7, y: 7, type: "/" },
       { x: 12, y: 10, type: "/" },
 
-      /* remaining distractions */
       { x: 2, y: 2, type: "/" },
       { x: 3, y: 12, type: "\\" },
       { x: 13, y: 12, type: "\\" }
@@ -241,13 +270,15 @@
       const cy = target.y * gridSize + gridSize / 2;
 
       ctx.fillStyle = "#facc15";
+      ctx.font = "bold 12px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("TARGET", cx, cy - 22);
+
       ctx.beginPath();
       ctx.arc(cx, cy, 15, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = "#020617";
-      ctx.font = "bold 12px Arial";
-      ctx.fillText("T", cx - 4, cy + 4);
+      ctx.textAlign = "left";
     }
 
     function drawBlockers() {
@@ -263,7 +294,7 @@
     }
 
     function drawMirrors() {
-      mirrors.forEach((m, index) => {
+      mirrors.forEach(m => {
         const x = m.x * gridSize;
         const y = m.y * gridSize;
 
@@ -284,10 +315,6 @@
 
         ctx.stroke();
         ctx.lineWidth = 1;
-
-        ctx.fillStyle = "#cbd5e1";
-        ctx.font = "bold 11px Arial";
-        ctx.fillText(index + 1, x + 5, y + 14);
       });
     }
 
@@ -428,6 +455,7 @@
       mirrors = JSON.parse(JSON.stringify(initialMirrors));
       showLaser = false;
       solvedAlready = false;
+      nextGameBtn.style.display = "none";
       message.textContent = "";
       draw();
     }
@@ -456,9 +484,12 @@
 
         if (result.solved) {
           solvedAlready = true;
+          localStorage.setItem("scienceBingo_path1_completed", "true");
+
           message.style.color = "#22c55e";
-          message.innerHTML =
-            "Correct. Laser reached the target. Secret digit unlocked: <strong>6</strong>";
+          message.innerHTML = "Correct. Laser reached the target.";
+
+          nextGameBtn.style.display = "inline-block";
         } else {
           message.textContent = "";
           vibrateWrong();
@@ -466,7 +497,18 @@
       }, 2000);
     }
 
+    if (localStorage.getItem("scienceBingo_path1_completed") === "true") {
+      nextGameBtn.style.display = "inline-block";
+    }
+
     draw();
   </script>
+  <footer class="site-footer">
+
+  <span>
+    Science Bingo | 2nd IUSC National Science Fest 2026
+  </span>
+
+</footer>
 </body>
 </html>
