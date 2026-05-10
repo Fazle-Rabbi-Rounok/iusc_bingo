@@ -1,381 +1,482 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>The Maze Draft</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Maze</title>
 
-    <style>
-      body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #111827;
-        color: white;
-        text-align: center;
-        padding: 20px;
-      }
+  <link rel="stylesheet" href="../css/style.css">
 
-      h1 {
-        color: #38bdf8;
-      }
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      color: white;
+      text-align: center;
+    }
 
+    h1 {
+      color: #38bdf8;
+    }
+
+    .box {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #1f2937;
+      padding: 20px;
+      border-radius: 14px;
+    }
+
+    .instructions {
+      color: #d1d5db;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    canvas {
+      background: #020617;
+      border: 3px solid #475569;
+      border-radius: 10px;
+      margin-top: 15px;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .message {
+      margin-top: 15px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      min-height: 28px;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #38bdf8;
+      color: #020617;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #67e8f9;
+    }
+
+    .mobile-controls {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+
+    .mobile-controls div {
+      display: flex;
+      gap: 55px;
+    }
+
+    .mobile-controls button {
+      width: 64px;
+      height: 64px;
+      font-size: 1.6rem;
+      border-radius: 50%;
+      border: none;
+      background: #38bdf8;
+      color: #020617;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .mobile-controls button:active {
+      transform: scale(0.92);
+      background: #67e8f9;
+    }
+
+    .escape-area {
+      margin-top: 24px;
+      padding: 16px;
+      background: #020617;
+      border: 1px solid #334155;
+      border-radius: 14px;
+    }
+
+    .escape-area input {
+      padding: 12px;
+      width: 220px;
+      border: none;
+      border-radius: 8px;
+      text-align: center;
+      margin-right: 8px;
+    }
+
+    .next-btn {
+      display: none;
+      margin-top: 18px;
+      padding: 13px 24px;
+      border-radius: 999px;
+      background: #22c55e;
+      color: #020617;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    @media (max-width: 600px) {
       .box {
-        max-width: 900px;
-        margin: auto;
-        background: #1f2937;
-        padding: 20px;
-        border-radius: 14px;
+        margin: 30px 10px;
+        padding: 14px;
       }
 
-      .instructions {
-        color: #d1d5db;
-        line-height: 1.6;
-        margin-bottom: 20px;
+      .escape-area input {
+        width: 180px;
+        margin-right: 0;
       }
+    }
+  </style>
+</head>
 
-      canvas {
-        background: #020617;
-        border: 3px solid #475569;
-        border-radius: 10px;
-        margin-top: 15px;
-      }
+<body>
 
-      .message {
-        margin-top: 15px;
-        font-size: 1.1rem;
-        font-weight: bold;
-        min-height: 28px;
-      }
+<header class="site-header">
 
-      button {
-        margin-top: 15px;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 8px;
-        background: #38bdf8;
-        color: #020617;
-        font-weight: bold;
-        cursor: pointer;
-      }
+  <div class="brand">
 
-      button:hover {
-        background: #67e8f9;
-      }
-      .mobile-controls {
-        margin-top: 18px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-        user-select: none;
-      }
-
-      .mobile-controls div {
-        display: flex;
-        gap: 55px;
-      }
-
-      .mobile-controls button {
-        width: 64px;
-        height: 64px;
-        font-size: 1.6rem;
-        border-radius: 50%;
-        border: none;
-        background: #38bdf8;
-        color: #020617;
-        font-weight: bold;
-        cursor: pointer;
-      }
-
-      .mobile-controls button:active {
-        transform: scale(0.92);
-        background: #67e8f9;
-      }
-
-      canvas {
-        max-width: 100%;
-        height: auto;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="box">
-      <h1>The Maze</h1>
-
-      <p class="instructions">
-        Use arrow keys to move from START to EXIT.<br />
-        Green balls make movement normal.<br />
-        Blue balls make movement mirrored.<br />
-        If you hit a wall, you restart from the beginning.
-      </p>
-
-      <button onclick="startGame()">Start / Restart</button>
-
-      <br />
-
-      <canvas id="maze" width="840" height="640"></canvas>
-      <div class="mobile-controls">
-        <button onclick="movePlayer(0, -1)">▲</button>
-
-        <div>
-          <button onclick="movePlayer(-1, 0)">◀</button>
-          <button onclick="movePlayer(1, 0)">▶</button>
-        </div>
-
-        <button onclick="movePlayer(0, 1)">▼</button>
-      </div>
-      <div class="message" id="message"></div>
+    <div class="mini-logo">
+      <img src="../assets/game_logo.png" alt="IUSC Logo">
     </div>
 
-    <script>
-      const canvas = document.getElementById("maze");
-      const ctx = canvas.getContext("2d");
-      const message = document.getElementById("message");
+    <div class="brand-text">
+      <small>Pubali Bank presents</small>
+      <strong>2nd IUSC National Science Fest 2026</strong>
+    </div>
 
-      const tile = 40;
+  </div>
 
-      /*
-      Legend:
-      1 = wall
-      0 = path
-      S = start
-      E = exit
-    */
+  <div class="header-badge">
+    Science Bingo
+  </div>
 
-      const maze = [
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, "S", 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1],
-        [1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1],
-        [1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-        [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1],
-        [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-        [1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1],
-        [1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
-        [1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-        [1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1],
-        [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
-        [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1],
-        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "E", 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      ];
+</header>
 
-      let player = { x: 1, y: 1 };
-      let started = false;
-      let mirrored = false;
+<div class="box">
 
-      /*
-      Orb chain:
-      Green → Blue → Green → Blue → Green → Blue
-    */
-      const orbs = [
-  { x: 4, y: 1, color: "green", used: false },
-  { x: 10, y: 1, color: "blue", used: false },
+  <h1>The Maze</h1>
 
-  { x: 12, y: 1, color: "green", used: false },
-  { x: 19, y: 3, color: "blue", used: false },
+  <p class="instructions">
+    Use the buttons to move from START to EXIT.<br>
+    Green orbs make movement normal.<br>
+    Blue orbs make movement mirrored.<br>
+    Collect all orbs before entering EXIT.<br>
+    If you hit a wall or enter EXIT too early, you restart from the beginning.
+  </p>
 
-  { x: 17, y: 5, color: "green", used: false },
-  { x: 14, y: 5, color: "blue", used: false },
+  <button onclick="startGame()">Start / Restart</button>
 
-  { x: 10, y: 5, color: "green", used: false },
-  { x: 10, y: 7, color: "blue", used: false },
+  <br>
 
-  { x: 12, y: 9, color: "green", used: false },
-  { x: 18, y: 9, color: "blue", used: false },
+  <canvas id="maze" width="840" height="640"></canvas>
 
-  { x: 19, y: 11, color: "green", used: false },
-  { x: 16, y: 11, color: "blue", used: false },
+  <div class="mobile-controls">
+    <button onclick="movePlayer(0, -1)">▲</button>
 
-  { x: 16, y: 13, color: "green", used: false },
-  { x: 14, y: 13, color: "blue", used: false },
+    <div>
+      <button onclick="movePlayer(-1, 0)">◀</button>
+      <button onclick="movePlayer(1, 0)">▶</button>
+    </div>
 
-  { x: 10, y: 13, color: "green", used: false },
-  { x: 10, y: 15, color: "blue", used: false },
+    <button onclick="movePlayer(0, 1)">▼</button>
+  </div>
 
-  { x: 8, y: 15, color: "green", used: false },
-  { x: 4, y: 15, color: "blue", used: false },
+  <div class="message" id="message"></div>
 
-  { x: 1, y: 15, color: "green", used: false },
-  { x: 1, y: 13, color: "blue", used: false },
+  <div class="escape-area">
+    <p>Emergency escape</p>
 
-  { x: 6, y: 13, color: "green", used: false },
-  { x: 8, y: 11, color: "blue", used: false },
+    <input
+      type="text"
+      id="escapeInput"
+      placeholder="Emergency Password"
+    >
 
-  { x: 5, y: 9, color: "green", used: false },
-  { x: 3, y: 9, color: "blue", used: false },
+    <button onclick="emergencyEscape()">Unlock</button>
+  </div>
 
-  { x: 3, y: 7, color: "green", used: false },
-  { x: 1, y: 5, color: "blue", used: false },
+  <a id="nextBtn" href="river_title.html" class="next-btn">
+    NEXT GAME
+  </a>
 
-  { x: 3, y: 3, color: "green", used: false },
-  { x: 6, y: 3, color: "blue", used: false },
+</div>
 
-  { x: 8, y: 3, color: "green", used: false },
-  { x: 14, y: 3, color: "blue", used: false },
+<footer class="site-footer">
+  <span>
+    Science Bingo | 2nd IUSC National Science Fest 2026
+  </span>
+</footer>
 
-  { x: 15, y: 15, color: "green", used: false },
-  { x: 18, y: 15, color: "blue", used: false }
-];
+<script>
+  const canvas = document.getElementById("maze");
+  const ctx = canvas.getContext("2d");
+  const message = document.getElementById("message");
+  const nextBtn = document.getElementById("nextBtn");
 
-      function startGame() {
-        player = { x: 1, y: 1 };
-        started = true;
-        mirrored = false;
+  const tile = 40;
 
-        orbs.forEach((orb) => (orb.used = false));
+  const maze = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, "S", 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+    [1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+    [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1],
+    [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+    [1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1],
+    [1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+    [1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+    [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1],
+    [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "E", 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  ];
 
-        message.style.color = "#d1d5db";
-        message.textContent = "Game started. Reach the exit.";
+  let player = { x: 1, y: 1 };
+  let started = false;
+  let mirrored = false;
 
-        drawMaze();
-      }
+  const orbs = [
+    { x: 4, y: 1, color: "green", used: false },
+    { x: 10, y: 1, color: "blue", used: false },
+    { x: 12, y: 1, color: "green", used: false },
+    { x: 19, y: 3, color: "blue", used: false },
+    { x: 17, y: 5, color: "green", used: false },
+    { x: 14, y: 5, color: "blue", used: false },
+    { x: 10, y: 5, color: "green", used: false },
+    { x: 10, y: 7, color: "blue", used: false },
+    { x: 12, y: 9, color: "green", used: false },
+    { x: 18, y: 9, color: "blue", used: false },
+    { x: 19, y: 11, color: "green", used: false },
+    { x: 16, y: 11, color: "blue", used: false },
+    { x: 16, y: 13, color: "green", used: false },
+    { x: 14, y: 13, color: "blue", used: false },
+    { x: 10, y: 13, color: "green", used: false },
+    { x: 10, y: 15, color: "blue", used: false },
+    { x: 8, y: 15, color: "green", used: false },
+    { x: 4, y: 15, color: "blue", used: false },
+    { x: 1, y: 15, color: "green", used: false },
+    { x: 1, y: 13, color: "blue", used: false },
+    { x: 6, y: 13, color: "green", used: false },
+    { x: 8, y: 11, color: "blue", used: false },
+    { x: 5, y: 9, color: "green", used: false },
+    { x: 3, y: 9, color: "blue", used: false },
+    { x: 3, y: 7, color: "green", used: false },
+    { x: 1, y: 5, color: "blue", used: false },
+    { x: 3, y: 3, color: "green", used: false },
+    { x: 6, y: 3, color: "blue", used: false },
+    { x: 8, y: 3, color: "green", used: false },
+    { x: 14, y: 3, color: "blue", used: false },
+    { x: 15, y: 15, color: "green", used: false },
+    { x: 18, y: 15, color: "blue", used: false }
+  ];
 
-      function resetToStart() {
-        player = { x: 1, y: 1 };
-        mirrored = false;
+  function startGame() {
+    player = { x: 1, y: 1 };
+    started = true;
+    mirrored = false;
 
-        orbs.forEach((orb) => (orb.used = false));
+    orbs.forEach((orb) => (orb.used = false));
 
-        message.style.color = "#f87171";
-        message.textContent = "You hit a wall. Restarted from the beginning.";
+    message.style.color = "#d1d5db";
+    message.textContent = "Game started. Collect all orbs before entering EXIT.";
 
-        drawMaze();
-      }
+    drawMaze();
+  }
 
-      function drawMaze() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+  function resetToStart() {
+    player = { x: 1, y: 1 };
+    mirrored = false;
 
-        for (let y = 0; y < maze.length; y++) {
-          for (let x = 0; x < maze[y].length; x++) {
-            const cell = maze[y][x];
+    orbs.forEach((orb) => (orb.used = false));
 
-            if (cell === 1) {
-              ctx.fillStyle = "#334155";
-            } else {
-              ctx.fillStyle = "#020617";
-            }
+    message.style.color = "#f87171";
+    message.textContent = "Restarted. Collect all orbs before entering EXIT.";
 
-            ctx.fillRect(x * tile, y * tile, tile, tile);
+    drawMaze();
+  }
 
-            ctx.strokeStyle = "#0f172a";
-            ctx.strokeRect(x * tile, y * tile, tile, tile);
+  function drawMaze() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (cell === "S") {
-              ctx.fillStyle = "#22c55e";
-              ctx.font = "bold 14px Arial";
-              ctx.fillText("START", x * tile + 3, y * tile + 25);
-            }
+    for (let y = 0; y < maze.length; y++) {
+      for (let x = 0; x < maze[y].length; x++) {
+        const cell = maze[y][x];
 
-            if (cell === "E") {
-              ctx.fillStyle = "#facc15";
-              ctx.font = "bold 18px Arial";
-              ctx.fillText("EXIT", x * tile + 3, y * tile + 25);
-            }
-          }
+        ctx.fillStyle = cell === 1 ? "#334155" : "#020617";
+        ctx.fillRect(x * tile, y * tile, tile, tile);
+
+        ctx.strokeStyle = "#0f172a";
+        ctx.strokeRect(x * tile, y * tile, tile, tile);
+
+        if (cell === "S") {
+          ctx.fillStyle = "#22c55e";
+          ctx.font = "bold 12px Arial";
+          ctx.textAlign = "center";
+          ctx.fillText("START", x * tile + tile / 2, y * tile + 25);
+          ctx.textAlign = "left";
         }
 
-        drawOrbs();
-        drawPlayer();
+        if (cell === "E") {
+          ctx.fillStyle = "#facc15";
+          ctx.fillRect(x * tile + 4, y * tile + 4, tile - 8, tile - 8);
+
+          ctx.fillStyle = "#020617";
+          ctx.font = "bold 12px Arial";
+          ctx.textAlign = "center";
+          ctx.fillText("EXIT", x * tile + tile / 2, y * tile + 25);
+          ctx.textAlign = "left";
+        }
       }
+    }
 
-      function drawOrbs() {
-        orbs.forEach((orb) => {
-          if (!orb.used) {
-            ctx.beginPath();
-            ctx.arc(
-              orb.x * tile + tile / 2,
-              orb.y * tile + tile / 2,
-              10,
-              0,
-              Math.PI * 2,
-            );
+    drawOrbs();
+    drawPlayer();
+  }
 
-            ctx.fillStyle = orb.color === "green" ? "#22c55e" : "#3b82f6";
-            ctx.fill();
-          }
-        });
-      }
-
-      function drawPlayer() {
+  function drawOrbs() {
+    orbs.forEach((orb) => {
+      if (!orb.used) {
         ctx.beginPath();
         ctx.arc(
-          player.x * tile + tile / 2,
-          player.y * tile + tile / 2,
-          13,
+          orb.x * tile + tile / 2,
+          orb.y * tile + tile / 2,
+          10,
           0,
-          Math.PI * 2,
+          Math.PI * 2
         );
 
-        ctx.fillStyle = "#f8fafc";
+        ctx.fillStyle = orb.color === "green" ? "#22c55e" : "#3b82f6";
         ctx.fill();
       }
+    });
+  }
 
-      function movePlayer(dx, dy) {
-        if (!started) return;
+  function drawPlayer() {
+    const cx = player.x * tile + tile / 2;
+    const cy = player.y * tile + tile / 2;
 
-        let moveX = dx;
-        let moveY = dy;
+    ctx.fillStyle = "#f8fafc";
 
-        if (mirrored) {
-          moveX = -dx;
-          moveY = -dy;
-        }
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - 14);
+    ctx.lineTo(cx - 13, cy + 12);
+    ctx.lineTo(cx + 13, cy + 12);
+    ctx.closePath();
 
-        const newX = player.x + moveX;
-        const newY = player.y + moveY;
+    ctx.fill();
+  }
 
-        if (maze[newY][newX] === 1) {
-          resetToStart();
-          return;
-        }
+  function movePlayer(dx, dy) {
+    if (!started) return;
 
-        player.x = newX;
-        player.y = newY;
+    let moveX = dx;
+    let moveY = dy;
 
-        checkOrb();
-        checkExit();
-        drawMaze();
-      }
+    if (mirrored) {
+      moveX = -dx;
+      moveY = -dy;
+    }
 
-      function checkOrb() {
-        orbs.forEach((orb) => {
-          if (!orb.used && orb.x === player.x && orb.y === player.y) {
-            orb.used = true;
+    const newX = player.x + moveX;
+    const newY = player.y + moveY;
 
-            if (orb.color === "green") {
-              mirrored = false;
-            }
-
-            if (orb.color === "blue") {
-              mirrored = true;
-            }
-          }
-        });
-      }
-
-      function checkExit() {
-  if (maze[player.y][player.x] === "E") {
-    const collectedAll = orbs.every((orb) => orb.used);
-
-    if (!collectedAll) {
+    if (maze[newY][newX] === 1) {
       resetToStart();
-      message.style.color = "#f87171";
-      message.textContent =
-        "Exit rejected. Collect every orb before entering the exit.";
       return;
     }
 
-    started = false;
-    message.style.color = "#22c55e";
-    message.innerHTML =
-      "Maze completed. All orbs collected. Secret digit unlocked: <strong>7</strong>";
-  }
-}
+    player.x = newX;
+    player.y = newY;
 
-      drawMaze();
-    </script>
-  </body>
+    checkOrb();
+    checkExit();
+    drawMaze();
+  }
+
+  function checkOrb() {
+    orbs.forEach((orb) => {
+      if (!orb.used && orb.x === player.x && orb.y === player.y) {
+        orb.used = true;
+
+        if (orb.color === "green") {
+          mirrored = false;
+        }
+
+        if (orb.color === "blue") {
+          mirrored = true;
+        }
+      }
+    });
+  }
+
+  function completeGame(text) {
+    started = false;
+
+    localStorage.setItem(
+      "scienceBingo_mirror3_completed",
+      "true"
+    );
+
+    message.style.color = "#22c55e";
+    message.innerHTML = text;
+
+    nextBtn.style.display = "inline-block";
+  }
+
+  function checkExit() {
+    if (maze[player.y][player.x] === "E") {
+      const collectedAll = orbs.every((orb) => orb.used);
+
+      if (!collectedAll) {
+        resetToStart();
+        message.style.color = "#f87171";
+        message.textContent =
+          "Exit rejected. Collect all orbs before entering EXIT.";
+        return;
+      }
+
+      completeGame(
+  'Maze completed. Password revealed: <strong>among</strong>'
+);
+    }
+  }
+
+  function emergencyEscape() {
+    const input = document
+      .getElementById("escapeInput")
+      .value
+      .trim()
+      .toLowerCase();
+
+    if (input === "wall breaker") {
+    completeGame(
+  'Emergency unlock accepted. Password revealed: <strong>among</strong>'
+);
+    } else {
+      message.style.color = "#f87171";
+      message.textContent = "Incorrect emergency password.";
+    }
+  }
+
+  if (localStorage.getItem("scienceBingo_mirror3_completed") === "true") {
+    nextBtn.style.display = "inline-block";
+  }
+
+  drawMaze();
+</script>
+
+</body>
 </html>
