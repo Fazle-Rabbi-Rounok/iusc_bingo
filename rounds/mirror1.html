@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mirror Clock Puzzle</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #111827;
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .game {
+    max-width: 760px;
+    margin: auto;
+    background: #1f2937;
+    border-radius: 18px;
+    padding: 22px;
+  }
+
+  h1 {
+    color: #38bdf8;
+  }
+
+  .instructions {
+    color: #d1d5db;
+    line-height: 1.7;
+  }
+
+  .clock-box {
+    margin: 24px auto;
+    background: #020617;
+    border: 1px solid #334155;
+    border-radius: 18px;
+    padding: 20px;
+  }
+
+  canvas {
+    background: #0f172a;
+    border-radius: 50%;
+    border: 4px solid #475569;
+    max-width: 100%;
+  }
+
+  .note {
+    color: #facc15;
+    font-weight: bold;
+    margin-top: 12px;
+  }
+
+  input {
+    padding: 12px;
+    width: 170px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    text-align: center;
+  }
+
+  button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #38bdf8;
+    color: #020617;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+
+  .message {
+    margin-top: 18px;
+    min-height: 28px;
+    font-weight: bold;
+  }
+
+  .success {
+    color: #22c55e;
+  }
+
+  .danger {
+    color: #f87171;
+  }
+
+  @media (max-width: 600px) {
+    button {
+      margin-left: 0;
+      margin-top: 10px;
+      width: 170px;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="game">
+  <h1>Mirror Clock Puzzle</h1>
+
+  <p class="instructions">
+    The analog clock below is seen through a mirror.<br>
+    First mentally restore the real clock, then calculate the smaller angle between the hour hand and minute hand.
+  </p>
+
+  <div class="clock-box">
+    <canvas id="clockCanvas" width="320" height="320"></canvas>
+    <div class="note">This is the mirrored clock view.</div>
+  </div>
+
+  <p>Enter the smaller angle in degrees:</p>
+
+  <input type="number" id="answerInput" placeholder="Angle">
+
+  <button onclick="checkAnswer()">Submit</button>
+
+  <div class="message" id="message"></div>
+</div>
+
+<script>
+  const canvas = document.getElementById("clockCanvas");
+  const ctx = canvas.getContext("2d");
+
+  /*
+    Real clock time: 4:50
+    Mirrored clock view will look like 7:10.
+    
+    Real angle:
+    Hour hand at 4:50 = 4*30 + 50*0.5 = 145°
+    Minute hand at 50 = 50*6 = 300°
+    Difference = 155°
+    Smaller angle = 155°
+  */
+
+  const realHour = 2;
+const realMinute = 20;
+const correctAngle = 50;
+
+  function drawClock() {
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const radius = 140;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.save();
+
+    /*
+      Mirror effect:
+      horizontally flip the whole clock.
+    */
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+
+    drawClockFace(cx, cy, radius);
+    drawHands(cx, cy, radius, realHour, realMinute);
+
+    ctx.restore();
+  }
+
+  function drawClockFace(cx, cy, radius) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.fillStyle = "#020617";
+    ctx.fill();
+
+    ctx.strokeStyle = "#94a3b8";
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    
+
+    for (let i = 0; i < 60; i++) {
+      const angle = (i * 6 - 90) * Math.PI / 180;
+      const outerX = cx + Math.cos(angle) * (radius - 8);
+      const outerY = cy + Math.sin(angle) * (radius - 8);
+      const innerX = cx + Math.cos(angle) * (radius - (i % 5 === 0 ? 18 : 12));
+      const innerY = cy + Math.sin(angle) * (radius - (i % 5 === 0 ? 18 : 12));
+
+      ctx.strokeStyle = i % 5 === 0 ? "#cbd5e1" : "#64748b";
+      ctx.lineWidth = i % 5 === 0 ? 2 : 1;
+
+      ctx.beginPath();
+      ctx.moveTo(innerX, innerY);
+      ctx.lineTo(outerX, outerY);
+      ctx.stroke();
+    }
+  }
+
+  function drawHands(cx, cy, radius, hour, minute) {
+    const hourAngle = ((hour % 12) * 30 + minute * 0.5 - 90) * Math.PI / 180;
+    const minuteAngle = (minute * 6 - 90) * Math.PI / 180;
+
+    drawHand(cx, cy, hourAngle, radius * 0.48, 7, "#facc15");
+    drawHand(cx, cy, minuteAngle, radius * 0.72, 5, "#38bdf8");
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+    ctx.fillStyle = "#f8fafc";
+    ctx.fill();
+  }
+
+  function drawHand(cx, cy, angle, length, width, color) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineCap = "round";
+
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(
+      cx + Math.cos(angle) * length,
+      cy + Math.sin(angle) * length
+    );
+    ctx.stroke();
+  }
+
+  function checkAnswer() {
+    const input = Number(document.getElementById("answerInput").value);
+    const message = document.getElementById("message");
+
+    if (input === correctAngle) {
+      message.className = "message success";
+      message.innerHTML = "Correct. Secret digit unlocked: <strong>9</strong>";
+    } else {
+      message.className = "message danger";
+      message.textContent = "Incorrect. Restore the real clock first, then calculate the smaller angle.";
+    }
+  }
+
+  drawClock();
+</script>
+
+</body>
+</html>

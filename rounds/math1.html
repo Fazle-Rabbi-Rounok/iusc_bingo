@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Balance Box Puzzle</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #111827;
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .game {
+    max-width: 950px;
+    margin: auto;
+    background: #1f2937;
+    border-radius: 18px;
+    padding: 20px;
+  }
+
+  h1 {
+    color: #38bdf8;
+  }
+
+  .instructions {
+    color: #d1d5db;
+    line-height: 1.7;
+  }
+
+  .scale-area {
+    display: grid;
+    grid-template-columns: 1fr 160px 1fr;
+    gap: 14px;
+    margin-top: 24px;
+    align-items: stretch;
+  }
+
+  .pan {
+    min-height: 260px;
+    background: #020617;
+    border: 2px solid #475569;
+    border-radius: 16px;
+    padding: 14px;
+  }
+
+  .pan h2 {
+    margin-top: 0;
+    color: #facc15;
+  }
+
+  .scale-center {
+    background: #0f172a;
+    border: 2px solid #38bdf8;
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .scale-symbol {
+    font-size: 3rem;
+    margin-bottom: 12px;
+  }
+
+  .box-pool {
+    margin-top: 25px;
+    background: #020617;
+    border: 1px solid #334155;
+    border-radius: 16px;
+    padding: 16px;
+  }
+
+  .boxes {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .box-item {
+    background: #334155;
+    border: 1px solid #64748b;
+    border-radius: 12px;
+    padding: 14px 8px;
+    cursor: pointer;
+    font-weight: bold;
+    user-select: none;
+  }
+
+  .box-item.selected {
+    background: #facc15;
+    color: #020617;
+  }
+
+  .box-item.used-left {
+    background: #14532d;
+    border-color: #22c55e;
+  }
+
+  .box-item.used-right {
+    background: #713f12;
+    border-color: #facc15;
+  }
+
+  .actions {
+    margin-top: 18px;
+  }
+
+  button {
+    padding: 12px 16px;
+    margin: 5px;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+
+  .left-btn {
+    background: #22c55e;
+    color: #020617;
+  }
+
+  .right-btn {
+    background: #facc15;
+    color: #020617;
+  }
+
+  .remove-btn {
+    background: #64748b;
+    color: white;
+  }
+
+  .check-btn {
+    background: #38bdf8;
+    color: #020617;
+  }
+
+  .reset-btn {
+    background: #ef4444;
+    color: white;
+  }
+
+  .pan-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .small-box {
+    background: #1e293b;
+    border: 1px solid #64748b;
+    border-radius: 10px;
+    padding: 10px;
+    font-weight: bold;
+  }
+
+  .message {
+    margin-top: 18px;
+    min-height: 28px;
+    font-weight: bold;
+  }
+
+  .success {
+    color: #22c55e;
+  }
+
+  .danger {
+    color: #f87171;
+  }
+
+  .neutral {
+    color: #d1d5db;
+  }
+
+  @media (max-width: 750px) {
+    .scale-area {
+      grid-template-columns: 1fr;
+    }
+
+    .boxes {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="game">
+  <h1>Balance Box Puzzle</h1>
+
+  <p class="instructions">
+    There are 10 boxes with hidden weights between 10 kg and 50 kg.<br>
+    Select boxes and place them on the left or right side of the scale.<br>
+    Your goal is to make the two sides perfectly balanced.
+  </p>
+
+  <div class="scale-area">
+    <div class="pan">
+      <h2>Left Pan</h2>
+      <div class="pan-items" id="leftPan"></div>
+    </div>
+
+    <div class="scale-center">
+      <div class="scale-symbol" id="scaleSymbol">⚖️</div>
+      <div id="scaleStatus">Waiting...</div>
+    </div>
+
+    <div class="pan">
+      <h2>Right Pan</h2>
+      <div class="pan-items" id="rightPan"></div>
+    </div>
+  </div>
+
+  <div class="box-pool">
+    <h2>Boxes</h2>
+    <p style="color:#94a3b8;">Tap a box, then choose where to place it.</p>
+
+    <div class="boxes" id="boxes"></div>
+
+    <div class="actions">
+      <button class="left-btn" onclick="placeSelected('left')">Place Left</button>
+      <button class="right-btn" onclick="placeSelected('right')">Place Right</button>
+      <button class="remove-btn" onclick="placeSelected('none')">Remove</button>
+      <br>
+      <button class="check-btn" onclick="checkBalance()">Check Balance</button>
+      <button class="reset-btn" onclick="resetGame()">Reset</button>
+    </div>
+  </div>
+
+  <div class="message" id="message"></div>
+</div>
+
+<script>
+ const boxesData = [
+  { id: "A", weight: 11 },
+  { id: "B", weight: 12 },
+  { id: "C", weight: 14 },
+  { id: "D", weight: 16 },
+  { id: "E", weight: 21 },
+  { id: "F", weight: 22 },
+  { id: "G", weight: 26 },
+];
+
+  let placement = {};
+  let selectedBox = null;
+
+  const boxesDiv = document.getElementById("boxes");
+  const leftPan = document.getElementById("leftPan");
+  const rightPan = document.getElementById("rightPan");
+  const scaleStatus = document.getElementById("scaleStatus");
+  const scaleSymbol = document.getElementById("scaleSymbol");
+  const message = document.getElementById("message");
+
+  function initGame() {
+    boxesData.forEach(box => {
+      placement[box.id] = "none";
+    });
+
+    selectedBox = null;
+    render();
+    showMessage("Select boxes and balance the scale.", "neutral");
+  }
+
+  function render() {
+    boxesDiv.innerHTML = "";
+    leftPan.innerHTML = "";
+    rightPan.innerHTML = "";
+
+    boxesData.forEach(box => {
+      const div = document.createElement("div");
+      div.className = "box-item";
+
+      if (selectedBox === box.id) {
+        div.classList.add("selected");
+      }
+
+      if (placement[box.id] === "left") {
+        div.classList.add("used-left");
+      }
+
+      if (placement[box.id] === "right") {
+        div.classList.add("used-right");
+      }
+
+      div.textContent = `Box ${box.id} • ${box.weight} kg`;
+      div.onclick = () => selectBox(box.id);
+
+      boxesDiv.appendChild(div);
+
+      if (placement[box.id] === "left") {
+        addSmallBox(leftPan, box.id);
+      }
+
+      if (placement[box.id] === "right") {
+        addSmallBox(rightPan, box.id);
+      }
+    });
+
+    updateScalePreview();
+  }
+
+  function addSmallBox(container, id) {
+    const div = document.createElement("div");
+    div.className = "small-box";
+    const box = boxesData.find(b => b.id === id);
+div.textContent = `${box.weight} kg`;
+    container.appendChild(div);
+  }
+
+  function selectBox(id) {
+    selectedBox = selectedBox === id ? null : id;
+    render();
+  }
+
+  function placeSelected(side) {
+    if (!selectedBox) {
+      showMessage("Select a box first.", "danger");
+      return;
+    }
+
+    placement[selectedBox] = side;
+    selectedBox = null;
+    render();
+    showMessage("Box moved.", "neutral");
+  }
+
+  function getTotal(side) {
+    return boxesData
+      .filter(box => placement[box.id] === side)
+      .reduce((sum, box) => sum + box.weight, 0);
+  }
+
+  function updateScalePreview() {
+    const leftTotal = getTotal("left");
+    const rightTotal = getTotal("right");
+
+    if (leftTotal === 0 && rightTotal === 0) {
+      scaleSymbol.textContent = "⚖️";
+      scaleStatus.textContent = "Waiting...";
+      return;
+    }
+
+    if (leftTotal > rightTotal) {
+      scaleSymbol.textContent = "⬅️";
+      scaleStatus.textContent = "Left side is heavier";
+    } else if (rightTotal > leftTotal) {
+      scaleSymbol.textContent = "➡️";
+      scaleStatus.textContent = "Right side is heavier";
+    } else {
+      scaleSymbol.textContent = "⚖️";
+      scaleStatus.textContent = "Looks balanced";
+    }
+  }
+
+  function checkBalance() {
+    const leftTotal = getTotal("left");
+    const rightTotal = getTotal("right");
+
+    if (leftTotal === 0 && rightTotal === 0) {
+      showMessage("Place some boxes first.", "danger");
+      return;
+    }
+
+    if (leftTotal === rightTotal) {
+      showMessage(
+        `Correct. Both sides are ${leftTotal} kg. Secret digit unlocked: 7`,
+        "success"
+      );
+    } else {
+      showMessage("Not balanced yet. Try again.", "danger");
+    }
+  }
+
+  function resetGame() {
+    placement = {};
+    initGame();
+  }
+
+  function showMessage(text, type) {
+    message.className = `message ${type}`;
+    message.textContent = text;
+  }
+
+  initGame();
+</script>
+
+</body>
+</html>

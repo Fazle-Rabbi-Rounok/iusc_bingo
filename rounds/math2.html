@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Code Deduction Puzzle</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #111827;
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .game {
+    max-width: 850px;
+    margin: auto;
+    background: #1f2937;
+    border-radius: 18px;
+    padding: 22px;
+  }
+
+  h1 {
+    color: #38bdf8;
+  }
+
+  .instructions {
+    color: #d1d5db;
+    line-height: 1.7;
+  }
+
+  .clues {
+    margin-top: 24px;
+    display: grid;
+    gap: 14px;
+  }
+
+  .clue {
+    background: #020617;
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 16px;
+    text-align: left;
+  }
+
+  .guess {
+    color: #facc15;
+    font-size: 1.4rem;
+    font-weight: bold;
+    letter-spacing: 4px;
+  }
+
+  .clue p {
+    color: #d1d5db;
+    margin-bottom: 0;
+    line-height: 1.6;
+  }
+
+  .answer-area {
+    margin-top: 26px;
+    background: #020617;
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 18px;
+  }
+
+  input {
+    padding: 12px;
+    width: 180px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    text-align: center;
+    letter-spacing: 4px;
+  }
+
+  button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #38bdf8;
+    color: #020617;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+
+  .message {
+    margin-top: 18px;
+    min-height: 28px;
+    font-weight: bold;
+  }
+
+  .success {
+    color: #22c55e;
+  }
+
+  .danger {
+    color: #f87171;
+  }
+
+  @media (max-width: 600px) {
+    button {
+      margin-left: 0;
+      margin-top: 10px;
+      width: 180px;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="game">
+  <h1>Code Deduction Puzzle</h1>
+
+  <p class="instructions">
+    A 3-digit code is locked behind these clues.<br>
+    Use logic only. No digit is repeated.
+  </p>
+
+  <div class="clues">
+
+    <div class="clue">
+      <div class="guess">682</div>
+      <p>One digit is correct and in the correct position.</p>
+    </div>
+
+    <div class="clue">
+      <div class="guess">614</div>
+      <p>One digit is correct but in the wrong position.</p>
+    </div>
+
+    <div class="clue">
+      <div class="guess">206</div>
+      <p>Two digits are correct but both are in the wrong position.</p>
+    </div>
+
+    <div class="clue">
+      <div class="guess">738</div>
+      <p>No digit is correct.</p>
+    </div>
+
+    <div class="clue">
+      <div class="guess">780</div>
+      <p>One digit is correct but in the wrong position.</p>
+    </div>
+
+  </div>
+
+  <div class="answer-area">
+    <p>Enter the 3-digit code:</p>
+
+    <input type="text" id="answerInput" maxlength="3" placeholder="Code">
+
+    <button onclick="checkAnswer()">Submit</button>
+
+    <div class="message" id="message"></div>
+  </div>
+</div>
+
+<script>
+  function checkAnswer() {
+    const input = document.getElementById("answerInput").value.trim();
+    const message = document.getElementById("message");
+
+    if (input === "042") {
+      message.className = "message success";
+      message.innerHTML = "Correct. Code cracked. Secret digit unlocked: <strong>4</strong>";
+    } else {
+      message.className = "message danger";
+      message.textContent = "Incorrect. Recheck the clue logic.";
+    }
+  }
+</script>
+
+</body>
+</html>

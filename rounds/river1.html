@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Classic River Crossing</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #111827;
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .game {
+    max-width: 900px;
+    margin: auto;
+    background: #1f2937;
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  h1 {
+    color: #38bdf8;
+  }
+
+  .instructions {
+    color: #d1d5db;
+    line-height: 1.6;
+  }
+
+  .river-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 180px 1fr;
+    gap: 15px;
+    margin-top: 25px;
+  }
+
+  .bank {
+    min-height: 320px;
+    background: #14532d;
+    border: 2px solid #22c55e;
+    border-radius: 14px;
+    padding: 15px;
+  }
+
+  .river {
+    background: #075985;
+    border: 2px solid #38bdf8;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .boat {
+    background: #92400e;
+    border: 2px solid #f59e0b;
+    border-radius: 16px;
+    padding: 15px;
+    width: 140px;
+    min-height: 120px;
+  }
+
+  .item {
+    background: #020617;
+    border: 1px solid #475569;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+
+  .item.selected {
+    background: #facc15;
+    color: #020617;
+  }
+
+  button {
+    margin-top: 20px;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #38bdf8;
+    color: #020617;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .reset-btn {
+    background: #64748b;
+    color: white;
+    margin-left: 8px;
+  }
+
+  .message {
+    margin-top: 18px;
+    min-height: 28px;
+    font-weight: bold;
+  }
+
+  .danger {
+    color: #f87171;
+  }
+
+  .success {
+    color: #22c55e;
+  }
+
+  @media (max-width: 700px) {
+    .river-wrapper {
+      grid-template-columns: 1fr;
+    }
+
+    .river {
+      min-height: 150px;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="game">
+  <h1>River Crossing</h1>
+
+  <p class="instructions">
+    Move the Tiger, Goat and Leaf safely to the right bank.<br>
+    The boat can carry you and only ONE item at a time.<br><br>
+    Rules:<br>
+    • Tiger cannot stay with Goat without you.<br>
+    • Goat cannot stay with Leaf without you.
+  </p>
+
+  <div class="river-wrapper">
+    <div class="bank">
+      <h2>Left Bank</h2>
+      <div id="leftBank"></div>
+    </div>
+
+    <div class="river">
+      <div class="boat">
+        <strong>⛵ Boat</strong>
+        <p id="boatSide">Left Side</p>
+        <p id="boatCargo">No item selected</p>
+      </div>
+    </div>
+
+    <div class="bank">
+      <h2>Right Bank</h2>
+      <div id="rightBank"></div>
+    </div>
+  </div>
+
+  <button onclick="crossRiver()">Cross River</button>
+  <button class="reset-btn" onclick="resetGame()">Reset</button>
+
+  <div class="message" id="message"></div>
+</div>
+
+<script>
+  const items = ["Tiger", "Goat", "Leaf"];
+
+  const emojis = {
+    Tiger: "🐅",
+    Goat: "🐐",
+    Leaf: "🍃"
+  };
+
+  let state = {
+    Tiger: "left",
+    Goat: "left",
+    Leaf: "left",
+    player: "left",
+    boat: "left"
+  };
+
+  let selected = null;
+  let moves = 0;
+
+  const leftBank = document.getElementById("leftBank");
+  const rightBank = document.getElementById("rightBank");
+  const boatSide = document.getElementById("boatSide");
+  const boatCargo = document.getElementById("boatCargo");
+  const message = document.getElementById("message");
+
+  function render() {
+    leftBank.innerHTML = "";
+    rightBank.innerHTML = "";
+
+    items.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "item";
+
+      if (selected === item) {
+        div.classList.add("selected");
+      }
+
+      div.textContent = `${emojis[item]} ${item}`;
+      div.onclick = () => selectItem(item);
+
+      if (state[item] === "left") {
+        leftBank.appendChild(div);
+      } else {
+        rightBank.appendChild(div);
+      }
+    });
+
+    boatSide.textContent = state.boat === "left" ? "Left Side" : "Right Side";
+    boatCargo.textContent = selected
+      ? `Selected: ${emojis[selected]} ${selected}`
+      : "No item selected";
+  }
+
+  function selectItem(item) {
+    if (state[item] !== state.boat) {
+      showMessage("That item is not on the boat side.", "danger");
+      return;
+    }
+
+    selected = selected === item ? null : item;
+    showMessage("");
+    render();
+  }
+
+  function crossRiver() {
+    const from = state.boat;
+    const to = from === "left" ? "right" : "left";
+
+    state.player = to;
+    state.boat = to;
+
+    if (selected) {
+      state[selected] = to;
+    }
+
+    selected = null;
+    moves++;
+
+    render();
+
+    if (!isSafe()) {
+      showMessage("Unsafe! The rules were broken. Restarting...", "danger");
+      setTimeout(resetGame, 1200);
+      return;
+    }
+
+    if (hasWon()) {
+      showMessage(`Solved in ${moves} moves. Secret digit unlocked: 8`, "success");
+      return;
+    }
+
+    showMessage(`Move ${moves} completed.`);
+  }
+
+  function isSafe() {
+    for (const side of ["left", "right"]) {
+      const playerThere = state.player === side;
+
+      const tiger = state.Tiger === side;
+      const goat = state.Goat === side;
+      const leaf = state.Leaf === side;
+
+      if (!playerThere && tiger && goat) return false;
+      if (!playerThere && goat && leaf) return false;
+    }
+
+    return true;
+  }
+
+  function hasWon() {
+    return items.every(item => state[item] === "right");
+  }
+
+  function resetGame() {
+    state = {
+      Tiger: "left",
+      Goat: "left",
+      Leaf: "left",
+      player: "left",
+      boat: "left"
+    };
+
+    selected = null;
+    moves = 0;
+
+    render();
+    showMessage("Game reset.");
+  }
+
+  function showMessage(text, type = "") {
+    message.className = `message ${type}`;
+    message.textContent = text;
+  }
+
+  render();
+</script>
+
+</body>
+</html>

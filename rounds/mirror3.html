@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>The Maze Draft</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #111827;
+        color: white;
+        text-align: center;
+        padding: 20px;
+      }
+
+      h1 {
+        color: #38bdf8;
+      }
+
+      .box {
+        max-width: 900px;
+        margin: auto;
+        background: #1f2937;
+        padding: 20px;
+        border-radius: 14px;
+      }
+
+      .instructions {
+        color: #d1d5db;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
+
+      canvas {
+        background: #020617;
+        border: 3px solid #475569;
+        border-radius: 10px;
+        margin-top: 15px;
+      }
+
+      .message {
+        margin-top: 15px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        min-height: 28px;
+      }
+
+      button {
+        margin-top: 15px;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        background: #38bdf8;
+        color: #020617;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #67e8f9;
+      }
+      .mobile-controls {
+        margin-top: 18px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        user-select: none;
+      }
+
+      .mobile-controls div {
+        display: flex;
+        gap: 55px;
+      }
+
+      .mobile-controls button {
+        width: 64px;
+        height: 64px;
+        font-size: 1.6rem;
+        border-radius: 50%;
+        border: none;
+        background: #38bdf8;
+        color: #020617;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .mobile-controls button:active {
+        transform: scale(0.92);
+        background: #67e8f9;
+      }
+
+      canvas {
+        max-width: 100%;
+        height: auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="box">
+      <h1>The Maze</h1>
+
+      <p class="instructions">
+        Use arrow keys to move from START to EXIT.<br />
+        Green balls make movement normal.<br />
+        Blue balls make movement mirrored.<br />
+        If you hit a wall, you restart from the beginning.
+      </p>
+
+      <button onclick="startGame()">Start / Restart</button>
+
+      <br />
+
+      <canvas id="maze" width="840" height="640"></canvas>
+      <div class="mobile-controls">
+        <button onclick="movePlayer(0, -1)">▲</button>
+
+        <div>
+          <button onclick="movePlayer(-1, 0)">◀</button>
+          <button onclick="movePlayer(1, 0)">▶</button>
+        </div>
+
+        <button onclick="movePlayer(0, 1)">▼</button>
+      </div>
+      <div class="message" id="message"></div>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("maze");
+      const ctx = canvas.getContext("2d");
+      const message = document.getElementById("message");
+
+      const tile = 40;
+
+      /*
+      Legend:
+      1 = wall
+      0 = path
+      S = start
+      E = exit
+    */
+
+      const maze = [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, "S", 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+        [1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1],
+        [1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+        [1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1],
+        [1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+        [1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+        [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1],
+        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "E", 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      ];
+
+      let player = { x: 1, y: 1 };
+      let started = false;
+      let mirrored = false;
+
+      /*
+      Orb chain:
+      Green → Blue → Green → Blue → Green → Blue
+    */
+      const orbs = [
+  { x: 4, y: 1, color: "green", used: false },
+  { x: 10, y: 1, color: "blue", used: false },
+
+  { x: 12, y: 1, color: "green", used: false },
+  { x: 19, y: 3, color: "blue", used: false },
+
+  { x: 17, y: 5, color: "green", used: false },
+  { x: 14, y: 5, color: "blue", used: false },
+
+  { x: 10, y: 5, color: "green", used: false },
+  { x: 10, y: 7, color: "blue", used: false },
+
+  { x: 12, y: 9, color: "green", used: false },
+  { x: 18, y: 9, color: "blue", used: false },
+
+  { x: 19, y: 11, color: "green", used: false },
+  { x: 16, y: 11, color: "blue", used: false },
+
+  { x: 16, y: 13, color: "green", used: false },
+  { x: 14, y: 13, color: "blue", used: false },
+
+  { x: 10, y: 13, color: "green", used: false },
+  { x: 10, y: 15, color: "blue", used: false },
+
+  { x: 8, y: 15, color: "green", used: false },
+  { x: 4, y: 15, color: "blue", used: false },
+
+  { x: 1, y: 15, color: "green", used: false },
+  { x: 1, y: 13, color: "blue", used: false },
+
+  { x: 6, y: 13, color: "green", used: false },
+  { x: 8, y: 11, color: "blue", used: false },
+
+  { x: 5, y: 9, color: "green", used: false },
+  { x: 3, y: 9, color: "blue", used: false },
+
+  { x: 3, y: 7, color: "green", used: false },
+  { x: 1, y: 5, color: "blue", used: false },
+
+  { x: 3, y: 3, color: "green", used: false },
+  { x: 6, y: 3, color: "blue", used: false },
+
+  { x: 8, y: 3, color: "green", used: false },
+  { x: 14, y: 3, color: "blue", used: false },
+
+  { x: 15, y: 15, color: "green", used: false },
+  { x: 18, y: 15, color: "blue", used: false }
+];
+
+      function startGame() {
+        player = { x: 1, y: 1 };
+        started = true;
+        mirrored = false;
+
+        orbs.forEach((orb) => (orb.used = false));
+
+        message.style.color = "#d1d5db";
+        message.textContent = "Game started. Reach the exit.";
+
+        drawMaze();
+      }
+
+      function resetToStart() {
+        player = { x: 1, y: 1 };
+        mirrored = false;
+
+        orbs.forEach((orb) => (orb.used = false));
+
+        message.style.color = "#f87171";
+        message.textContent = "You hit a wall. Restarted from the beginning.";
+
+        drawMaze();
+      }
+
+      function drawMaze() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let y = 0; y < maze.length; y++) {
+          for (let x = 0; x < maze[y].length; x++) {
+            const cell = maze[y][x];
+
+            if (cell === 1) {
+              ctx.fillStyle = "#334155";
+            } else {
+              ctx.fillStyle = "#020617";
+            }
+
+            ctx.fillRect(x * tile, y * tile, tile, tile);
+
+            ctx.strokeStyle = "#0f172a";
+            ctx.strokeRect(x * tile, y * tile, tile, tile);
+
+            if (cell === "S") {
+              ctx.fillStyle = "#22c55e";
+              ctx.font = "bold 14px Arial";
+              ctx.fillText("START", x * tile + 3, y * tile + 25);
+            }
+
+            if (cell === "E") {
+              ctx.fillStyle = "#facc15";
+              ctx.font = "bold 18px Arial";
+              ctx.fillText("EXIT", x * tile + 3, y * tile + 25);
+            }
+          }
+        }
+
+        drawOrbs();
+        drawPlayer();
+      }
+
+      function drawOrbs() {
+        orbs.forEach((orb) => {
+          if (!orb.used) {
+            ctx.beginPath();
+            ctx.arc(
+              orb.x * tile + tile / 2,
+              orb.y * tile + tile / 2,
+              10,
+              0,
+              Math.PI * 2,
+            );
+
+            ctx.fillStyle = orb.color === "green" ? "#22c55e" : "#3b82f6";
+            ctx.fill();
+          }
+        });
+      }
+
+      function drawPlayer() {
+        ctx.beginPath();
+        ctx.arc(
+          player.x * tile + tile / 2,
+          player.y * tile + tile / 2,
+          13,
+          0,
+          Math.PI * 2,
+        );
+
+        ctx.fillStyle = "#f8fafc";
+        ctx.fill();
+      }
+
+      function movePlayer(dx, dy) {
+        if (!started) return;
+
+        let moveX = dx;
+        let moveY = dy;
+
+        if (mirrored) {
+          moveX = -dx;
+          moveY = -dy;
+        }
+
+        const newX = player.x + moveX;
+        const newY = player.y + moveY;
+
+        if (maze[newY][newX] === 1) {
+          resetToStart();
+          return;
+        }
+
+        player.x = newX;
+        player.y = newY;
+
+        checkOrb();
+        checkExit();
+        drawMaze();
+      }
+
+      function checkOrb() {
+        orbs.forEach((orb) => {
+          if (!orb.used && orb.x === player.x && orb.y === player.y) {
+            orb.used = true;
+
+            if (orb.color === "green") {
+              mirrored = false;
+            }
+
+            if (orb.color === "blue") {
+              mirrored = true;
+            }
+          }
+        });
+      }
+
+      function checkExit() {
+  if (maze[player.y][player.x] === "E") {
+    const collectedAll = orbs.every((orb) => orb.used);
+
+    if (!collectedAll) {
+      resetToStart();
+      message.style.color = "#f87171";
+      message.textContent =
+        "Exit rejected. Collect every orb before entering the exit.";
+      return;
+    }
+
+    started = false;
+    message.style.color = "#22c55e";
+    message.innerHTML =
+      "Maze completed. All orbs collected. Secret digit unlocked: <strong>7</strong>";
+  }
+}
+
+      drawMaze();
+    </script>
+  </body>
+</html>
