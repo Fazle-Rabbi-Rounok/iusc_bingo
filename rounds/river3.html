@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Humans and Cannibals River Crossing</title>
+<title>Timed River Crossing</title>
 
 <style>
   body {
@@ -31,9 +31,21 @@
     line-height: 1.7;
   }
 
+  .timer-box {
+    margin: 18px auto;
+    padding: 14px;
+    max-width: 280px;
+    background: #020617;
+    border: 1px solid #475569;
+    border-radius: 14px;
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #facc15;
+  }
+
   .river-wrapper {
     display: grid;
-    grid-template-columns: 1fr 200px 1fr;
+    grid-template-columns: 1fr 220px 1fr;
     gap: 15px;
     margin-top: 24px;
   }
@@ -42,7 +54,7 @@
     background: #14532d;
     border: 2px solid #22c55e;
     border-radius: 16px;
-    min-height: 420px;
+    min-height: 430px;
     padding: 16px;
   }
 
@@ -56,8 +68,8 @@
   }
 
   .boat {
-    width: 170px;
-    min-height: 180px;
+    width: 180px;
+    min-height: 185px;
     background: #92400e;
     border: 2px solid #f59e0b;
     border-radius: 18px;
@@ -144,16 +156,21 @@
 <body>
 
 <div class="game">
-  <h1>Humans and Cannibals</h1>
+  <h1>Timed River Crossing</h1>
 
   <p class="instructions">
-    Move all 3 humans and 3 cannibals safely to the right bank.<br><br>
+    Five people must cross the river within <strong>30 seconds</strong> total.<br><br>
+    Crossing times: 1s, 3s, 6s, 8s, 12s.<br><br>
     Rules:<br>
-    • Boat carries at least ONE person and maximum TWO persons.<br>
+    • Boat carries at least ONE person and maximum TWO people.<br>
     • Boat cannot move empty.<br>
-    • If cannibals are more than humans on any side, the humans get eaten.<br>
-    • If there are no humans on a side, cannibals are safe there.
+    • If two people cross together, the boat takes the slower person's time.<br>
+    • Everyone must end on the right bank within 30 seconds.
   </p>
+
+  <div class="timer-box" id="timerBox">
+    Time Used: 0 / 30 sec
+  </div>
 
   <div class="river-wrapper">
     <div class="bank">
@@ -185,31 +202,31 @@
 
 <script>
   const people = [
-    { id: "H1", label: "Human 1", type: "human", emoji: "🧍" },
-    { id: "H2", label: "Human 2", type: "human", emoji: "🧍" },
-    { id: "H3", label: "Human 3", type: "human", emoji: "🧍" },
-    { id: "C1", label: "Cannibal 1", type: "cannibal", emoji: "🧟" },
-    { id: "C2", label: "Cannibal 2", type: "cannibal", emoji: "🧟" },
-    { id: "C3", label: "Cannibal 3", type: "cannibal", emoji: "🧟" }
+    { id: "P1", label: "Person 1", time: 1 },
+    { id: "P3", label: "Person 3", time: 3 },
+    { id: "P6", label: "Person 6", time: 6 },
+    { id: "P8", label: "Person 8", time: 8 },
+    { id: "P12", label: "Person 12", time: 12 }
   ];
 
   let state = {
-    H1: "left",
-    H2: "left",
-    H3: "left",
-    C1: "left",
-    C2: "left",
-    C3: "left",
+    P1: "left",
+    P3: "left",
+    P6: "left",
+    P8: "left",
+    P12: "left",
     boat: "left"
   };
 
   let selected = [];
+  let timeUsed = 0;
   let moves = 0;
 
   const leftBank = document.getElementById("leftBank");
   const rightBank = document.getElementById("rightBank");
   const boatSide = document.getElementById("boatSide");
   const boatCargo = document.getElementById("boatCargo");
+  const timerBox = document.getElementById("timerBox");
   const message = document.getElementById("message");
 
   function render() {
@@ -224,7 +241,7 @@
         div.classList.add("selected");
       }
 
-      div.textContent = `${person.emoji} ${person.label}`;
+      div.textContent = `👤 ${person.time} sec`;
       div.onclick = () => selectPerson(person.id);
 
       if (state[person.id] === "left") {
@@ -234,14 +251,19 @@
       }
     });
 
-    boatSide.textContent = state.boat === "left" ? "Left Side" : "Right Side";
+    boatSide.textContent =
+      state.boat === "left"
+      ? "Left Side"
+      : "Right Side";
 
     boatCargo.innerHTML = selected.length
       ? "Selected:<br>" + selected.map(id => {
           const p = people.find(person => person.id === id);
-          return `${p.emoji} ${p.label}`;
+          return `👤 ${p.time} sec`;
         }).join("<br>")
       : "No one selected";
+
+    timerBox.textContent = `Time Used: ${timeUsed} / 30 sec`;
   }
 
   function selectPerson(id) {
@@ -254,7 +276,7 @@
       selected = selected.filter(x => x !== id);
     } else {
       if (selected.length >= 2) {
-        showMessage("Boat can carry maximum two persons.", "danger");
+        showMessage("Boat can carry maximum two people.", "danger");
         return;
       }
 
@@ -271,45 +293,43 @@
       return;
     }
 
+    const tripTime = Math.max(
+      ...selected.map(id => people.find(p => p.id === id).time)
+    );
+
     const from = state.boat;
     const to = from === "left" ? "right" : "left";
-
-    state.boat = to;
 
     selected.forEach(id => {
       state[id] = to;
     });
 
-    selected = [];
+    state.boat = to;
+    timeUsed += tripTime;
     moves++;
+    selected = [];
 
     render();
 
-    if (!isSafe()) {
-      showMessage("Unsafe! Cannibals outnumbered humans. Restarting...", "danger");
-      setTimeout(resetGame, 1200);
+    if (timeUsed > 30) {
+      showMessage("Time exceeded 30 seconds. Restarting...", "danger");
+
+      setTimeout(() => {
+        resetGame();
+      }, 1300);
+
       return;
     }
 
     if (hasWon()) {
-      showMessage(`Solved in ${moves} moves. Secret digit unlocked: 9`, "success");
+      showMessage(
+        `Solved in ${moves} moves using ${timeUsed} seconds. Secret digit unlocked: 2`,
+        "success"
+      );
       return;
     }
 
-    showMessage(`Move ${moves} completed.`);
-  }
-
-  function isSafe() {
-    return sideIsSafe("left") && sideIsSafe("right");
-  }
-
-  function sideIsSafe(side) {
-    const humans = people.filter(p => p.type === "human" && state[p.id] === side).length;
-    const cannibals = people.filter(p => p.type === "cannibal" && state[p.id] === side).length;
-
-    if (humans === 0) return true;
-
-    return humans >= cannibals;
+    showMessage(`Move ${moves} completed. Trip took ${tripTime} sec.`);
   }
 
   function hasWon() {
@@ -318,16 +338,16 @@
 
   function resetGame() {
     state = {
-      H1: "left",
-      H2: "left",
-      H3: "left",
-      C1: "left",
-      C2: "left",
-      C3: "left",
+      P1: "left",
+      P3: "left",
+      P6: "left",
+      P8: "left",
+      P12: "left",
       boat: "left"
     };
 
     selected = [];
+    timeUsed = 0;
     moves = 0;
 
     render();

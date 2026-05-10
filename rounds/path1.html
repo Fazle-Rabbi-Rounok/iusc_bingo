@@ -59,10 +59,6 @@
       cursor: pointer;
     }
 
-    button:hover {
-      background: #67e8f9;
-    }
-
     .message {
       margin-top: 16px;
       min-height: 28px;
@@ -97,7 +93,7 @@
 
     <p class="instructions">
       Rotate the mirrors so the hidden laser reaches the yellow target.<br>
-      Tap a mirror to rotate it. The laser path will only appear briefly after checking.
+      Tap a mirror to rotate it. The laser path appears only briefly after checking.
     </p>
 
     <canvas id="laserCanvas" width="760" height="560"></canvas>
@@ -126,98 +122,92 @@
     let showLaser = false;
     let solvedAlready = false;
 
-   const source = {
-  x: 1,
-  y: 11,
-  dir: "right"
-};
+    const source = {
+      x: 1,
+      y: 11,
+      dir: "right"
+    };
 
-  const target = {
-  x: 17,
-  y: 2
-};
+    const target = {
+      x: 17,
+      y: 2
+    };
 
-   const blockers = [
-  { x: 5, y: 11 },
-  { x: 6, y: 11 },
-  { x: 7, y: 11 },
+    const blockers = [
+      { x: 5, y: 11 },
+      { x: 6, y: 11 },
+      { x: 7, y: 11 },
 
-  { x: 3, y: 3 },
-  { x: 4, y: 3 },
-  { x: 5, y: 3 },
+      { x: 3, y: 3 },
+      { x: 4, y: 3 },
+      { x: 5, y: 3 },
 
-  { x: 9, y: 8 },
-  { x: 9, y: 9 },
-  { x: 9, y: 10 },
+      { x: 9, y: 8 },
+      { x: 9, y: 9 },
+      { x: 9, y: 10 },
 
-  { x: 12, y: 4 },
-  { x: 12, y: 5 },
-  { x: 12, y: 6 },
+      { x: 12, y: 4 },
+      { x: 12, y: 5 },
+      { x: 12, y: 6 },
 
-  { x: 15, y: 5 },
-  { x: 15, y: 6 },
-  { x: 15, y: 7 },
+      { x: 15, y: 5 },
+      { x: 15, y: 6 },
+      { x: 15, y: 7 },
 
-  { x: 14, y: 12 },
-  { x: 15, y: 12 },
+      { x: 14, y: 12 },
+      { x: 15, y: 12 },
 
-  { x: 16, y: 9 },
-  { x: 17, y: 9 }
-];
+      { x: 16, y: 9 },
+      { x: 17, y: 9 }
+    ];
 
-    /*
-      Correct path uses mirrors:
-      (4,10), (4,6), (8,6), (8,3), (13,3), (13,2)
+    let mirrors = [
+      /* correct route, scrambled */
+      { x: 4, y: 11, type: "\\" },  // correct: /
+      { x: 4, y: 8, type: "\\" },   // correct: /
+      { x: 8, y: 8, type: "/" },    // correct: \
+      { x: 8, y: 12, type: "/" },   // correct: \
+      { x: 10, y: 12, type: "\\" }, // correct: /
+      { x: 10, y: 7, type: "\\" },  // correct: /
+      { x: 14, y: 7, type: "/" },   // correct: \
+      { x: 14, y: 10, type: "/" },  // correct: \
+      { x: 18, y: 10, type: "\\" }, // correct: /
+      { x: 18, y: 3, type: "/" },   // correct: \
+      { x: 16, y: 3, type: "/" },   // correct: \
+      { x: 16, y: 2, type: "\\" },  // correct: /
 
-      Other mirrors are distractions.
-    */
-  let mirrors = [
-  /* correct route, scrambled */
-  { x: 4, y: 11, type: "\\" },  // correct: /
-  { x: 4, y: 8, type: "\\" },   // correct: /
-  { x: 8, y: 8, type: "/" },    // correct: \
-  { x: 8, y: 12, type: "/" },   // correct: \
-  { x: 10, y: 12, type: "\\" }, // correct: /
-  { x: 10, y: 7, type: "\\" },  // correct: /
-  { x: 14, y: 7, type: "/" },   // correct: \
-  { x: 14, y: 10, type: "/" },  // correct: \
-  { x: 18, y: 10, type: "\\" }, // correct: /
-  { x: 18, y: 3, type: "/" },   // correct: \
-  { x: 16, y: 3, type: "/" },   // correct: \
-  { x: 16, y: 2, type: "\\" },  // correct: /
+      /* decoy route A */
+      { x: 4, y: 12, type: "/" },
+      { x: 2, y: 9, type: "/" },
+      { x: 6, y: 9, type: "\\" },
 
-  /* decoy route A: looks useful after first turn, but dies lower-left */
-  { x: 4, y: 12, type: "/" },
-  { x: 2, y: 12, type: "\\" },
-  { x: 2, y: 9, type: "/" },
-  { x: 6, y: 9, type: "\\" },
+      /* decoy route B */
+      { x: 4, y: 5, type: "\\" },
+      { x: 7, y: 5, type: "/" },
+      { x: 7, y: 2, type: "\\" },
 
-  /* decoy route B: tempting upper-left chain */
-  { x: 4, y: 5, type: "\\" },
-  { x: 7, y: 5, type: "/" },
-  { x: 7, y: 2, type: "\\" },
-  { x: 11, y: 2, type: "/" },
+      /* decoy route C */
+      { x: 10, y: 5, type: "/" },
+      { x: 13, y: 5, type: "\\" },
+      { x: 13, y: 8, type: "/" },
+      { x: 16, y: 8, type: "\\" },
 
-  /* decoy route C: central believable chain */
-  { x: 10, y: 5, type: "/" },
-  { x: 13, y: 5, type: "\\" },
-  { x: 13, y: 8, type: "/" },
-  { x: 16, y: 8, type: "\\" },
+      /* near-target decoys */
+      { x: 15, y: 3, type: "/" },
+      { x: 17, y: 4, type: "\\" },
+      { x: 16, y: 5, type: "/" },
 
-  /* decoy route D: near-target trap */
-  { x: 15, y: 3, type: "/" },
-  { x: 17, y: 4, type: "\\" },
-  { x: 16, y: 5, type: "/" },
+      /* added mirrors from green marks */
+      { x: 1, y: 4, type: "/" },
+      { x: 1, y: 8, type: "/" },
+      { x: 7, y: 7, type: "/" },
+      { x: 12, y: 10, type: "/" },
 
-  /* random distraction mirrors */
-  { x: 2, y: 2, type: "/" },
-  { x: 6, y: 1, type: "\\" },
-  { x: 11, y: 1, type: "/" },
-  { x: 13, y: 2, type: "/" },
-  { x: 3, y: 12, type: "\\" },
-  { x: 13, y: 12, type: "\\" },
-  { x: 16, y: 12, type: "/" }
-];
+      /* remaining distractions */
+      { x: 2, y: 2, type: "/" },
+      { x: 3, y: 12, type: "\\" },
+      { x: 13, y: 12, type: "\\" }
+    ];
 
     const initialMirrors = JSON.parse(JSON.stringify(mirrors));
 
@@ -346,9 +336,7 @@
         x = next.x;
         y = next.y;
 
-        if (x < 0 || x >= cols || y < 0 || y >= rows) {
-          break;
-        }
+        if (x < 0 || x >= cols || y < 0 || y >= rows) break;
 
         path.push({ x, y });
 
@@ -357,9 +345,7 @@
           break;
         }
 
-        if (isBlockerAt(x, y)) {
-          break;
-        }
+        if (isBlockerAt(x, y)) break;
 
         const mirror = getMirrorAt(x, y);
 
@@ -378,10 +364,10 @@
       ctx.lineWidth = 4;
       ctx.beginPath();
 
-      const startX = source.x * gridSize + gridSize / 2;
-      const startY = source.y * gridSize + gridSize / 2;
-
-      ctx.moveTo(startX, startY);
+      ctx.moveTo(
+        source.x * gridSize + gridSize / 2,
+        source.y * gridSize + gridSize / 2
+      );
 
       result.path.forEach(p => {
         ctx.lineTo(
@@ -412,7 +398,6 @@
       if (solvedAlready) return;
 
       const rect = canvas.getBoundingClientRect();
-
       const scaleX = canvas.width / rect.width;
       const scaleY = canvas.height / rect.height;
 
@@ -472,7 +457,8 @@
         if (result.solved) {
           solvedAlready = true;
           message.style.color = "#22c55e";
-          message.innerHTML = "Correct. Laser reached the target. Secret digit unlocked: <strong>6</strong>";
+          message.innerHTML =
+            "Correct. Laser reached the target. Secret digit unlocked: <strong>6</strong>";
         } else {
           message.textContent = "";
           vibrateWrong();

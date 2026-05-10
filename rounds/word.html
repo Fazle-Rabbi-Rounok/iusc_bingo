@@ -2,426 +2,319 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sequence Vault Draft</title>
+<title>Time Delay Maze</title>
 
 <style>
-  * {
-    box-sizing: border-box;
-  }
-
   body {
     margin: 0;
-    min-height: 100vh;
-    background:
-      radial-gradient(circle at top left, rgba(0,255,153,0.18), transparent 30%),
-      radial-gradient(circle at bottom right, rgba(56,189,248,0.18), transparent 30%),
-      #111827;
-    color: #fff;
     font-family: Arial, sans-serif;
+    background: #111827;
+    color: white;
+    text-align: center;
     padding: 20px;
   }
 
-  .game-card {
-    max-width: 430px;
-    margin: 0 auto;
-    background: rgba(31, 41, 55, 0.94);
-    border: 1px solid #374151;
-    border-radius: 20px;
-    padding: 22px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  .game {
+    max-width: 780px;
+    margin: auto;
+    background: #1f2937;
+    padding: 20px;
+    border-radius: 16px;
   }
 
   h1 {
-    text-align: center;
-    color: #00ff99;
-    letter-spacing: 2px;
-    margin-bottom: 8px;
-  }
-
-  .subtitle {
-    text-align: center;
-    color: #cbd5e1;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    margin-bottom: 20px;
-  }
-
-  .vault-panel {
-    background: #020617;
-    border: 1px solid #334155;
-    border-radius: 16px;
-    padding: 18px;
-    margin-bottom: 18px;
-  }
-
-  .timer {
-    text-align: center;
-    color: #facc15;
-    font-size: 1.15rem;
-    font-weight: bold;
-    margin-bottom: 14px;
-  }
-
-  .input-display {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    margin-bottom: 15px;
-  }
-
-  .letter-box {
-    height: 52px;
-    border-radius: 12px;
-    background: #111827;
-    border: 1px solid #475569;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.45rem;
-    font-weight: bold;
     color: #38bdf8;
   }
 
-  .keypad {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    margin-bottom: 10px;
+  .instructions {
+    color: #d1d5db;
+    line-height: 1.7;
   }
 
-  .keypad button,
-  .action-row button {
+  .board {
+    width: min(92vw, 560px);
+    aspect-ratio: 1;
+    margin: 22px auto;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .cell {
+    background: #020617;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    position: relative;
+  }
+
+  .wall {
+    background: #475569;
+  }
+
+  .goal {
+    background: #facc15;
+    color: #020617;
+  }
+
+  .player {
+    background: #38bdf8;
+    color: #020617;
+    box-shadow: 0 0 15px rgba(56,189,248,0.8);
+  }
+
+  .queued {
+    outline: 3px solid #a78bfa;
+  }
+
+  .queued::after {
+    content: attr(data-step);
+    position: absolute;
+    top: 3px;
+    right: 5px;
+    font-size: 0.7rem;
+    color: #c4b5fd;
+  }
+
+  .controls {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .controls div {
+    display: flex;
+    gap: 55px;
+  }
+
+  button {
+    padding: 12px 18px;
     border: none;
-    border-radius: 12px;
-    padding: 13px 10px;
-    font-size: 1rem;
+    border-radius: 10px;
+    background: #38bdf8;
+    color: #020617;
     font-weight: bold;
     cursor: pointer;
+    margin: 5px;
   }
 
-  .keypad button {
-    background: #1e293b;
-    color: #f8fafc;
-    border: 1px solid #475569;
+  .controls button {
+    width: 64px;
+    height: 64px;
+    font-size: 1.5rem;
+    border-radius: 50%;
   }
 
-  .keypad button:active {
-    transform: scale(0.95);
-    background: #334155;
-  }
-
-  .action-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .clear-btn {
+  .reset-btn {
     background: #64748b;
     color: white;
   }
 
-  .guess-btn {
-    background: #00ff99;
-    color: #020617;
-  }
-
-  .feedback {
+  .message {
     margin-top: 18px;
-    max-height: 310px;
-    overflow-y: auto;
-  }
-
-  .guess-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 10px;
-    align-items: center;
-    background: #020617;
-    border: 1px solid #334155;
-    padding: 10px;
-    border-radius: 12px;
-    margin-bottom: 8px;
-    animation: slideIn 0.2s ease;
-  }
-
-  @keyframes slideIn {
-    from {
-      transform: translateY(-8px);
-      opacity: 0;
-    }
-
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-
-  .guess-word {
-    letter-spacing: 5px;
+    min-height: 28px;
     font-weight: bold;
-    color: #e5e7eb;
   }
 
-  .result-counts {
-    white-space: nowrap;
-  }
-
-  .correct-place {
-    color: #00ff99;
-    font-weight: bold;
-    margin-right: 6px;
-  }
-
-  .correct-letter {
+  .status {
     color: #facc15;
     font-weight: bold;
-    margin-right: 6px;
-  }
-
-  .incorrect {
-    color: #f87171;
-    font-weight: bold;
-  }
-
-  .message {
-    text-align: center;
-    min-height: 24px;
     margin-top: 12px;
-    color: #cbd5e1;
-    font-weight: bold;
   }
 
-  .success-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(2, 6, 23, 0.86);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 50;
-    padding: 20px;
+  .success {
+    color: #22c55e;
   }
 
-  .success-box {
-    max-width: 360px;
-    width: 100%;
-    text-align: center;
-    background: #00ff99;
-    color: #020617;
-    padding: 35px 25px;
-    border-radius: 22px;
-    box-shadow: 0 0 40px rgba(0,255,153,0.6);
-  }
-
-  .success-box h2 {
-    margin-bottom: 12px;
-    letter-spacing: 2px;
-  }
-
-  .digit {
-    font-size: 4rem;
-    font-weight: 900;
-    margin-top: 10px;
-  }
-
-  .rules {
-    margin-top: 15px;
-    color: #94a3b8;
-    font-size: 0.85rem;
-    line-height: 1.5;
-    text-align: center;
+  .danger {
+    color: #f87171;
   }
 </style>
 </head>
 
 <body>
 
-<div class="game-card">
-  <h1>SEQUENCE VAULT</h1>
+<div class="game">
+  <h1>Time Delay Maze</h1>
 
-  <p class="subtitle">
-    Crack the hidden 5-letter sequence using only A, B, C, D and E.
+  <p class="instructions">
+    Reach the yellow goal.<br>
+    Your command does not happen immediately.<br>
+    Every move you press is executed after <strong>2 turns</strong>.<br>
+    Plan ahead carefully.
   </p>
 
-  <div class="vault-panel">
-    <div class="timer" id="timer">Time: 0.0 s</div>
+  <div class="status" id="status">Delay Queue: empty</div>
 
-    <div class="input-display" id="inputDisplay">
-      <div class="letter-box"></div>
-      <div class="letter-box"></div>
-      <div class="letter-box"></div>
-      <div class="letter-box"></div>
-      <div class="letter-box"></div>
+  <div class="board" id="board"></div>
+
+  <div class="controls">
+    <button onclick="queueMove(0,-1,'▲')">▲</button>
+    <div>
+      <button onclick="queueMove(-1,0,'◀')">◀</button>
+      <button onclick="queueMove(1,0,'▶')">▶</button>
     </div>
-
-    <div class="keypad">
-      <button onclick="addLetter('A')">A</button>
-      <button onclick="addLetter('B')">B</button>
-      <button onclick="addLetter('C')">C</button>
-      <button onclick="addLetter('D')">D</button>
-      <button onclick="addLetter('E')">E</button>
-    </div>
-
-    <div class="action-row">
-      <button class="clear-btn" onclick="clearInput()">Clear</button>
-      <button class="guess-btn" onclick="submitGuess()">Guess</button>
-    </div>
-
-    <div class="message" id="message"></div>
+    <button onclick="queueMove(0,1,'▼')">▼</button>
   </div>
 
-  <div class="feedback" id="feedback"></div>
+  <button class="reset-btn" onclick="resetGame()">Reset</button>
 
-  <p class="rules">
-    ✔ = correct letter in correct place<br>
-    ~ = correct letter in wrong place<br>
-    ✖ = incorrect letter
-  </p>
-</div>
-
-<div class="success-overlay" id="successOverlay">
-  <div class="success-box">
-    <h2>ACCESS GRANTED</h2>
-    <p id="successText"></p>
-    <div>Secret Digit</div>
-    <div class="digit">5</div>
-  </div>
+  <div class="message" id="message"></div>
 </div>
 
 <script>
-  const letters = ['A','B','C','D','E'];
-  let target = '';
-  let attempts = 0;
-  let currentGuess = '';
+  const board = document.getElementById("board");
+  const message = document.getElementById("message");
+  const statusText = document.getElementById("status");
 
-  let startTime = null;
-  let timerInterval = null;
+  const size = 7;
+  const delay = 2;
 
-  const inputBoxes = document.querySelectorAll('.letter-box');
-  const timer = document.getElementById('timer');
-  const feedback = document.getElementById('feedback');
-  const message = document.getElementById('message');
-  const successOverlay = document.getElementById('successOverlay');
-  const successText = document.getElementById('successText');
+  /*
+    0 = path
+    1 = wall
+  */
+  const maze = [
+    [0,0,0,1,0,0,0],
+    [1,1,0,1,0,1,0],
+    [0,0,0,0,0,1,0],
+    [0,1,1,1,0,1,0],
+    [0,0,0,1,0,0,0],
+    [0,1,0,0,0,1,1],
+    [0,1,0,1,0,0,0]
+  ];
 
-  function generateWord() {
-    target = '';
+  const start = { x: 0, y: 0 };
+  const goal = { x: 6, y: 6 };
 
-    for (let i = 0; i < 5; i++) {
-      target += letters[Math.floor(Math.random() * letters.length)];
+  let player;
+  let queue;
+  let turn;
+  let gameOver;
+
+  function resetGame() {
+    player = { ...start };
+    queue = [];
+    turn = 0;
+    gameOver = false;
+
+    message.className = "message";
+    message.textContent = "";
+    updateStatus();
+    render();
+  }
+
+  function render() {
+    board.innerHTML = "";
+
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+
+        if (maze[y][x] === 1) {
+          cell.classList.add("wall");
+        }
+
+        if (x === goal.x && y === goal.y) {
+          cell.classList.add("goal");
+          cell.textContent = "G";
+        }
+
+        if (x === player.x && y === player.y) {
+          cell.classList.add("player");
+          cell.textContent = "P";
+        }
+
+        board.appendChild(cell);
+      }
     }
-
-    console.log("Target:", target);
   }
 
-  function startTimer() {
-    startTime = Date.now();
+  function queueMove(dx, dy, icon) {
+    if (gameOver) return;
 
-    timerInterval = setInterval(() => {
-      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-      timer.textContent = `Time: ${elapsed} s`;
-    }, 100);
+    turn++;
+
+    queue.push({
+      dx,
+      dy,
+      icon,
+      executeAt: turn + delay
+    });
+
+    executeReadyMoves();
+    updateStatus();
+    render();
+
+    if (player.x === goal.x && player.y === goal.y) {
+      win();
+    }
   }
 
-  function stopTimer() {
-    clearInterval(timerInterval);
-    return ((Date.now() - startTime) / 1000).toFixed(1);
-  }
+  function executeReadyMoves() {
+    const ready = queue.filter(move => move.executeAt <= turn);
+    queue = queue.filter(move => move.executeAt > turn);
 
-  function addLetter(letter) {
-    if (currentGuess.length >= 5) return;
-
-    currentGuess += letter;
-    updateInputDisplay();
-    message.textContent = '';
-  }
-
-  function clearInput() {
-    currentGuess = '';
-    updateInputDisplay();
-    message.textContent = '';
-  }
-
-  function updateInputDisplay() {
-    inputBoxes.forEach((box, index) => {
-      box.textContent = currentGuess[index] || '';
+    ready.forEach(move => {
+      applyMove(move.dx, move.dy);
     });
   }
 
-  function submitGuess() {
-    const guess = currentGuess;
+  function applyMove(dx, dy) {
+    const newX = player.x + dx;
+    const newY = player.y + dy;
 
-    if (guess.length !== 5) {
-      message.style.color = '#f87171';
-      message.textContent = 'Enter exactly 5 letters.';
+    if (
+      newX < 0 ||
+      newX >= size ||
+      newY < 0 ||
+      newY >= size ||
+      maze[newY][newX] === 1
+    ) {
+      fail("A delayed move crashed into a wall.");
       return;
     }
 
-    if (attempts === 0) {
-      startTimer();
-    }
-
-    attempts++;
-
-    let correctPlace = 0;
-    let correctLetter = 0;
-
-    let targetArr = target.split('');
-    let guessArr = guess.split('');
-    let usedTarget = Array(5).fill(false);
-
-    for (let i = 0; i < 5; i++) {
-      if (guessArr[i] === targetArr[i]) {
-        correctPlace++;
-        usedTarget[i] = true;
-        guessArr[i] = null;
-      }
-    }
-
-    for (let i = 0; i < 5; i++) {
-      if (guessArr[i] !== null) {
-        for (let j = 0; j < 5; j++) {
-          if (!usedTarget[j] && guessArr[i] === targetArr[j]) {
-            correctLetter++;
-            usedTarget[j] = true;
-            break;
-          }
-        }
-      }
-    }
-
-    const incorrect = 5 - correctPlace - correctLetter;
-
-    const row = document.createElement('div');
-    row.className = 'guess-row';
-    row.innerHTML = `
-      <span class="guess-word">${guess}</span>
-      <span class="result-counts">
-        <span class="correct-place">✔${correctPlace}</span>
-        <span class="correct-letter">~${correctLetter}</span>
-        <span class="incorrect">✖${incorrect}</span>
-      </span>
-    `;
-
-    feedback.prepend(row);
-
-    currentGuess = '';
-    updateInputDisplay();
-
-    if (correctPlace === 5) {
-      const timeTaken = stopTimer();
-
-      successText.innerHTML = `
-        Sequence cracked in <b>${attempts}</b> tries<br>
-        Time taken: <b>${timeTaken} seconds</b>
-      `;
-
-      successOverlay.style.display = 'flex';
-    }
+    player.x = newX;
+    player.y = newY;
   }
 
-  generateWord();
+  function updateStatus() {
+    if (queue.length === 0) {
+      statusText.textContent = "Delay Queue: empty";
+      return;
+    }
+
+    statusText.textContent =
+      "Delay Queue: " +
+      queue
+        .map(move => `${move.icon} in ${move.executeAt - turn} turn(s)`)
+        .join(" | ");
+  }
+
+  function fail(text) {
+    gameOver = true;
+    message.className = "message danger";
+    message.textContent = text;
+
+    setTimeout(resetGame, 1200);
+  }
+
+  function win() {
+    gameOver = true;
+    message.className = "message success";
+    message.innerHTML =
+      "Maze completed. Secret digit unlocked: <strong>8</strong>";
+  }
+
+  resetGame();
 </script>
 
 </body>

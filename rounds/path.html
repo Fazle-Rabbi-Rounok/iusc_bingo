@@ -1,159 +1,162 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Arrow Path Draft</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Arrow Path Draft</title>
 
-<style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #111827;
-    color: white;
-    padding: 20px;
-    text-align: center;
-  }
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #111827;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
 
-  .game {
-    max-width: 720px;
-    margin: auto;
-    background: #1f2937;
-    border-radius: 18px;
-    padding: 20px;
-  }
+      .game {
+        max-width: 720px;
+        margin: auto;
+        background: #1f2937;
+        border-radius: 18px;
+        padding: 20px;
+      }
 
-  h1 {
-    color: #38bdf8;
-  }
+      h1 {
+        color: #38bdf8;
+      }
 
-  .instructions {
-    color: #d1d5db;
-    line-height: 1.6;
-  }
+      .instructions {
+        color: #d1d5db;
+        line-height: 1.6;
+      }
 
-  .board {
-    width: min(92vw, 560px);
-    aspect-ratio: 1;
-    margin: 22px auto;
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 5px;
-  }
+      .board {
+        width: min(92vw, 560px);
+        aspect-ratio: 1;
+        margin: 22px auto;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 5px;
+      }
 
-  .cell {
-    background: #020617;
-    border: 1px solid #475569;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: clamp(1.2rem, 7vw, 2.2rem);
-    font-weight: bold;
-    cursor: pointer;
-    user-select: none;
-  }
+      .cell {
+        background: #020617;
+        border: 1px solid #475569;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(1.2rem, 7vw, 2.2rem);
+        font-weight: bold;
+        cursor: pointer;
+        user-select: none;
+      }
 
-  .cell.fixed {
-    background: #334155;
-    color: #cbd5e1;
-    cursor: not-allowed;
-  }
+      .cell.fixed {
+        background: #334155;
+        color: #cbd5e1;
+        cursor: not-allowed;
+      }
 
-  .cell.start {
-    background: #14532d;
-    color: #86efac;
-  }
+      .cell.start {
+        background: #14532d;
+        color: #86efac;
+      }
 
-  .cell.end {
-    background: #713f12;
-    color: #fde68a;
-  }
+      .cell.end {
+        background: #713f12;
+        color: #fde68a;
+      }
 
-  .cell.player {
-    outline: 4px solid #38bdf8;
-    box-shadow: 0 0 18px rgba(56,189,248,0.8);
-  }
+      .cell.player {
+        outline: 4px solid #38bdf8;
+        box-shadow: 0 0 18px rgba(56, 189, 248, 0.8);
+      }
 
-  .cell.path {
-    background: #0f766e;
-  }
+      .cell.path {
+        background: #0f766e;
+      }
 
-  button {
-    padding: 12px 18px;
-    margin: 6px;
-    border: none;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 1rem;
-  }
+      button {
+        padding: 12px 18px;
+        margin: 6px;
+        border: none;
+        border-radius: 10px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 1rem;
+      }
 
-  .run-btn {
-    background: #38bdf8;
-    color: #020617;
-  }
+      .run-btn {
+        background: #38bdf8;
+        color: #020617;
+      }
 
-  .reset-btn {
-    background: #64748b;
-    color: white;
-  }
+      .reset-btn {
+        background: #64748b;
+        color: white;
+      }
 
-  .message {
-    margin-top: 16px;
-    min-height: 28px;
-    font-weight: bold;
-  }
+      .message {
+        margin-top: 16px;
+        min-height: 28px;
+        font-weight: bold;
+      }
 
-  .success {
-    color: #22c55e;
-  }
+      .success {
+        color: #22c55e;
+      }
 
-  .danger {
-    color: #f87171;
-  }
-</style>
-</head>
+      .danger {
+        color: #f87171;
+      }
+    </style>
+  </head>
 
-<body>
+  <body>
+    <div class="game">
+      <h1>Arrow Path</h1>
 
-<div class="game">
-  <h1>Arrow Path</h1>
+      <p class="instructions">
+        Rotate the arrows to guide the path from <strong>START</strong> to
+        <strong>DESTINATION</strong>.<br />
+        New rule:
+        <strong
+          >every tile must be used exactly once before reaching the
+          destination.</strong
+        ><br />
+        Fixed arrows cannot be changed.
+      </p>
 
-  <p class="instructions">
-    Rotate the arrows to guide the path from <strong>START</strong> to <strong>DESTINATION</strong>.<br>
-    New rule: <strong>every tile must be used exactly once before reaching the destination.</strong><br>
-    Fixed arrows cannot be changed.
-  </p>
+      <div class="board" id="board"></div>
 
-  <div class="board" id="board"></div>
+      <button class="run-btn" onclick="runPath()">Run Path</button>
+      <button class="reset-btn" onclick="resetGame()">Reset</button>
 
-  <button class="run-btn" onclick="runPath()">Run Path</button>
-  <button class="reset-btn" onclick="resetGame()">Reset</button>
+      <div class="message" id="message"></div>
+    </div>
 
-  <div class="message" id="message"></div>
-</div>
+    <script>
+      const board = document.getElementById("board");
+      const message = document.getElementById("message");
 
-<script>
-  const board = document.getElementById("board");
-  const message = document.getElementById("message");
+      const size = 5;
 
-  const size = 6;
+      const directions = [
+        { icon: "↑", dx: 0, dy: -1 },
+        { icon: "↗", dx: 1, dy: -1 },
+        { icon: "→", dx: 1, dy: 0 },
+        { icon: "↘", dx: 1, dy: 1 },
+        { icon: "↓", dx: 0, dy: 1 },
+        { icon: "↙", dx: -1, dy: 1 },
+        { icon: "←", dx: -1, dy: 0 },
+        { icon: "↖", dx: -1, dy: -1 },
+      ];
 
-  const directions = [
-    { icon: "↑", dx: 0, dy: -1 },
-    { icon: "↗", dx: 1, dy: -1 },
-    { icon: "→", dx: 1, dy: 0 },
-    { icon: "↘", dx: 1, dy: 1 },
-    { icon: "↓", dx: 0, dy: 1 },
-    { icon: "↙", dx: -1, dy: 1 },
-    { icon: "←", dx: -1, dy: 0 },
-    { icon: "↖", dx: -1, dy: -1 }
-  ];
-
-  const start = { x: 0, y: 0 };
-  const end = { x: 5, y: 0 };
-
-  /*
+     const start = { x: 0, y: 2 };
+const end = { x: 4, y: 0 };
+      /*
     Correct full path idea:
     Down column 1,
     right,
@@ -171,163 +174,162 @@
     Some arrows are fixed to guide the snake-like route.
   */
 
-  const initialGrid = [
-    ["S4", 4, "F2", 4, "F2", "E"],
-    [4, 0, 4, 0, 4, 0],
-    [4, 0, 4, 0, 4, 0],
-    [4, 0, 4, 0, 4, 0],
-    [4, 0, 4, 0, 4, 0],
-    ["F2", 0, "F2", 0, "F2", 0]
-  ];
+const initialGrid = [
+  [0, "F4", 0, "F3", "E"],
+  ["F0", 0, 0, 0, "F4"],
+  ["S0", 0, 0, "F0", 0],
+  [0, 0, "F7", 0, 0],
+  ["F0", 0, 0, 0, "F6"]
+];
 
-  let grid = [];
-  let running = false;
+      let grid = [];
+      let running = false;
 
-  function cloneGrid(source) {
-    return source.map(row => row.map(cell => cell));
-  }
+      function cloneGrid(source) {
+        return source.map((row) => row.map((cell) => cell));
+      }
 
-  function render(playerPos = null, pathSet = new Set()) {
-    board.innerHTML = "";
+      function render(playerPos = null, pathSet = new Set()) {
+        board.innerHTML = "";
 
-    for (let y = 0; y < size; y++) {
-      for (let x = 0; x < size; x++) {
-        const cell = document.createElement("div");
-        cell.className = "cell";
+        for (let y = 0; y < size; y++) {
+          for (let x = 0; x < size; x++) {
+            const cell = document.createElement("div");
+            cell.className = "cell";
+
+            const value = grid[y][x];
+
+            if (value === "E") {
+              cell.classList.add("end");
+              cell.textContent = "D";
+            } else if (typeof value === "string" && value.startsWith("S")) {
+              cell.classList.add("start");
+              const dirIndex = Number(value.slice(1));
+              cell.textContent = "S" + directions[dirIndex].icon;
+            } else if (typeof value === "string" && value.startsWith("F")) {
+              cell.classList.add("fixed");
+              const dirIndex = Number(value.slice(1));
+              cell.textContent = directions[dirIndex].icon;
+            } else {
+              cell.textContent = directions[value].icon;
+              cell.onclick = () => rotateCell(x, y);
+            }
+
+            if (pathSet.has(`${x},${y}`)) {
+              cell.classList.add("path");
+            }
+
+            if (playerPos && playerPos.x === x && playerPos.y === y) {
+              cell.classList.add("player");
+            }
+
+            board.appendChild(cell);
+          }
+        }
+      }
+
+      function rotateCell(x, y) {
+        if (running) return;
 
         const value = grid[y][x];
 
-        if (value === "E") {
-          cell.classList.add("end");
-          cell.textContent = "D";
-        } else if (typeof value === "string" && value.startsWith("S")) {
-          cell.classList.add("start");
-          const dirIndex = Number(value.slice(1));
-          cell.textContent = "S" + directions[dirIndex].icon;
-        } else if (typeof value === "string" && value.startsWith("F")) {
-          cell.classList.add("fixed");
-          const dirIndex = Number(value.slice(1));
-          cell.textContent = directions[dirIndex].icon;
-        } else {
-          cell.textContent = directions[value].icon;
-          cell.onclick = () => rotateCell(x, y);
+        if (typeof value === "number") {
+          grid[y][x] = (value + 1) % directions.length;
+          message.className = "message";
+          message.textContent = "";
+          render();
         }
-
-        if (pathSet.has(`${x},${y}`)) {
-          cell.classList.add("path");
-        }
-
-        if (playerPos && playerPos.x === x && playerPos.y === y) {
-          cell.classList.add("player");
-        }
-
-        board.appendChild(cell);
-      }
-    }
-  }
-
-  function rotateCell(x, y) {
-    if (running) return;
-
-    const value = grid[y][x];
-
-    if (typeof value === "number") {
-      grid[y][x] = (value + 1) % directions.length;
-      message.className = "message";
-      message.textContent = "";
-      render();
-    }
-  }
-
-  async function runPath() {
-    if (running) return;
-
-    running = true;
-    message.textContent = "";
-
-    let x = start.x;
-    let y = start.y;
-
-    const visited = new Set();
-    const pathSet = new Set();
-
-    const totalTiles = size * size;
-
-    for (let step = 0; step < 100; step++) {
-      render({ x, y }, pathSet);
-      await sleep(220);
-
-      const key = `${x},${y}`;
-
-      if (visited.has(key)) {
-        fail("Failed. The path entered a loop.");
-        return;
       }
 
-      visited.add(key);
-      pathSet.add(key);
+      async function runPath() {
+        if (running) return;
 
-      if (x === end.x && y === end.y) {
-        if (visited.size === totalTiles) {
-          message.className = "message success";
-          message.innerHTML = "Success. Every tile was used. Secret digit unlocked: <strong>6</strong>";
-        } else {
-          fail("Failed. Destination reached before using every tile.");
+        running = true;
+        message.textContent = "";
+
+        let x = start.x;
+        let y = start.y;
+
+        const visited = new Set();
+        const pathSet = new Set();
+
+        const totalTiles = size * size;
+
+        for (let step = 0; step < 100; step++) {
+          render({ x, y }, pathSet);
+          await sleep(220);
+
+          const key = `${x},${y}`;
+
+          if (visited.has(key)) {
+            fail("Failed. The path entered a loop.");
+            return;
+          }
+
+          visited.add(key);
+          pathSet.add(key);
+
+          if (x === end.x && y === end.y) {
+            if (visited.size === totalTiles) {
+              message.className = "message success";
+              message.innerHTML =
+                "Success. Every tile was used. Secret digit unlocked: <strong>6</strong>";
+            } else {
+              fail("Failed. Destination reached before using every tile.");
+            }
+
+            running = false;
+            render();
+            return;
+          }
+
+          const value = grid[y][x];
+
+          let dirIndex;
+
+          if (typeof value === "string" && value.startsWith("S")) {
+            dirIndex = Number(value.slice(1));
+          } else if (typeof value === "string" && value.startsWith("F")) {
+            dirIndex = Number(value.slice(1));
+          } else {
+            dirIndex = value;
+          }
+
+          const dir = directions[dirIndex];
+
+          x += dir.dx;
+          y += dir.dy;
+
+          if (x < 0 || x >= size || y < 0 || y >= size) {
+            fail("Failed. The path left the board.");
+            return;
+          }
         }
 
+        fail("Failed. Too many steps.");
+      }
+
+      function fail(text) {
+        message.className = "message danger";
+        message.textContent = text;
         running = false;
         render();
-        return;
       }
 
-      const value = grid[y][x];
+      function resetGame() {
+        if (running) return;
 
-      let dirIndex;
-
-      if (typeof value === "string" && value.startsWith("S")) {
-        dirIndex = Number(value.slice(1));
-      } else if (typeof value === "string" && value.startsWith("F")) {
-        dirIndex = Number(value.slice(1));
-      } else {
-        dirIndex = value;
+        grid = cloneGrid(initialGrid);
+        message.className = "message";
+        message.textContent = "Game reset.";
+        render();
       }
 
-      const dir = directions[dirIndex];
-
-      x += dir.dx;
-      y += dir.dy;
-
-      if (x < 0 || x >= size || y < 0 || y >= size) {
-        fail("Failed. The path left the board.");
-        return;
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
       }
-    }
 
-    fail("Failed. Too many steps.");
-  }
-
-  function fail(text) {
-    message.className = "message danger";
-    message.textContent = text;
-    running = false;
-    render();
-  }
-
-  function resetGame() {
-    if (running) return;
-
-    grid = cloneGrid(initialGrid);
-    message.className = "message";
-    message.textContent = "Game reset.";
-    render();
-  }
-
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  resetGame();
-</script>
-
-</body>
+      resetGame();
+    </script>
+  </body>
 </html>
