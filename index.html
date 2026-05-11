@@ -1,168 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Science Bingo Access</title>
+  <title>Science Bingo</title>
 
-<link rel="stylesheet" href="css/style.css">
-
-<style>
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    color: white;
-    text-align: center;
-  }
-
-  .gate-page {
-    min-height: calc(100vh - 160px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 50px 20px;
-  }
-
-  .gate-card {
-    max-width: 760px;
-    width: 100%;
-    padding: 48px 28px;
-    border-radius: 34px;
-    border: 1px solid rgba(255,255,255,0.18);
-    background: linear-gradient(145deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04));
-    box-shadow: 0 40px 120px rgba(0,0,0,0.42), 0 0 80px rgba(56,189,248,0.14);
-    backdrop-filter: blur(18px);
-  }
-
-  .gate-card h1 {
-    font-size: clamp(2.4rem, 6vw, 5rem);
-    letter-spacing: 6px;
-    margin-bottom: 18px;
-    background: linear-gradient(90deg, #ffffff, #bae6fd, #c4b5fd);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  .gate-card p {
-    color: #d1d5db;
-    line-height: 1.8;
-    margin-bottom: 28px;
-  }
-
-  input {
-    width: min(90%, 420px);
-    padding: 15px;
-    border: none;
-    border-radius: 12px;
-    text-align: center;
-    font-size: 1.05rem;
-  }
-
-  button {
-    margin-top: 18px;
-    padding: 14px 28px;
-    border: none;
-    border-radius: 999px;
-    background: #38bdf8;
-    color: #020617;
-    font-weight: 900;
-    cursor: pointer;
-  }
-
-  .message {
-    margin-top: 20px;
-    min-height: 28px;
-    font-weight: bold;
-  }
-
-  .danger {
-    color: #f87171;
-  }
-</style>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
-<header class="site-header">
-  <div class="brand">
-    <div class="mini-logo">
-      <img src="assets/game_logo.png" alt="IUSC Logo">
+  <header class="site-header">
+
+    <div class="brand">
+      <div class="mini-logo">
+        <img src="assets/game_logo.png" alt="IUSC Logo">
+      </div>
+
+      <div class="brand-text">
+        <small>Pubali Bank presents</small>
+        <strong>2nd IUSC National Science Fest 2026</strong>
+      </div>
     </div>
 
-    <div class="brand-text">
-      <small>Pubali Bank presents</small>
-      <strong>2nd IUSC National Science Fest 2026</strong>
+    <div class="header-badge">
+      Science Bingo
     </div>
-  </div>
 
-  <div class="header-badge">
-    Science Bingo
-  </div>
-</header>
+  </header>
 
-<main class="gate-page">
-  <div class="gate-card">
-    <h1>ACCESS LOCK</h1>
+  <main class="landing-page">
 
-    <p>
-      Science Bingo is locked until the event begins.<br>
-      Enter the access password to start the game.
-    </p>
+    <div class="landing-content">
 
-    <input
-      type="password"
-      id="accessInput"
-      placeholder="Enter access password"
-      autocomplete="off"
-    >
+      <img src="assets/game_logo.png" alt="Science Bingo Logo" class="main-logo">
 
-    <br>
+      <h1>
+  WELCOME TO
+  <span>SCIENCE BINGO</span>
+</h1>
 
-    <button onclick="checkAccess()">
-      ENTER
-    </button>
+      <p>
+        Logic will guide you.<br>
+        Observation will protect you.<br>
+        Time will challenge you.
+      </p>
 
-    <div class="message" id="message"></div>
-  </div>
-</main>
+      <a href="instruction.html" class="enter-btn">
+        ENTER THE GAME
+      </a>
 
-<footer class="site-footer">
-  <span>
-    Science Bingo | 2nd IUSC National Science Fest 2026
-  </span>
-</footer>
+    </div>
 
-<script>
-  const accessPassword = "iusc bingo";
+  </main>
 
-  function checkAccess() {
-    const input = document
-      .getElementById("accessInput")
-      .value
-      .trim()
-      .toLowerCase();
+  <footer class="site-footer">
 
-    const message = document.getElementById("message");
+    <span>
+      Science Bingo | 2nd IUSC National Science Fest 2026
+    </span>
 
-    if (input === accessPassword) {
-      window.location.href = "home.html";
-    } else {
-      message.className = "message danger";
-      message.textContent = "Incorrect access password.";
-    }
-  }
-
-  document
-    .getElementById("accessInput")
-    .addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
-        checkAccess();
-      }
-    });
-</script>
+  </footer>
 
 </body>
 </html>
