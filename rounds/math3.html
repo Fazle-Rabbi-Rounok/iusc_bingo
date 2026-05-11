@@ -2,70 +2,138 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Sugar Jar Puzzle</title>
+
+<link rel="stylesheet" href="../css/style.css">
 
 <style>
   body {
     margin: 0;
+    padding: 0;
     font-family: Arial, sans-serif;
-    background: #111827;
     color: white;
-    padding: 20px;
     text-align: center;
   }
 
   .game {
-    max-width: 900px;
-    margin: auto;
-    background: #1f2937;
-    border-radius: 18px;
-    padding: 22px;
+    max-width: 1050px;
+    margin: 40px auto;
+    padding: 24px;
+    border-radius: 26px;
+    border: 1px solid rgba(255,255,255,0.16);
+    background:
+      linear-gradient(
+        145deg,
+        rgba(255,255,255,0.12),
+        rgba(255,255,255,0.04)
+      );
+    box-shadow:
+      0 30px 80px rgba(0,0,0,0.35),
+      0 0 60px rgba(56,189,248,0.12);
+
+    backdrop-filter: blur(16px);
   }
 
   h1 {
     color: #38bdf8;
+    letter-spacing: 2px;
   }
 
   .instructions {
     color: #d1d5db;
-    line-height: 1.7;
+    line-height: 1.8;
+    max-width: 760px;
+    margin: auto;
   }
 
   .jar-area {
     display: flex;
     justify-content: center;
     align-items: end;
-    gap: 24px;
-    margin-top: 30px;
+    gap: 26px;
+    margin-top: 34px;
     flex-wrap: wrap;
   }
 
   .jar-card {
-    background: #020617;
-    border: 1px solid #334155;
-    border-radius: 16px;
-    padding: 16px;
-    width: 180px;
+    background:
+      linear-gradient(
+        160deg,
+        rgba(2,6,23,0.95),
+        rgba(15,23,42,0.92)
+      );
+
+    border: 1px solid rgba(148,163,184,0.3);
+    border-radius: 24px;
+    padding: 20px;
+    width: 210px;
+
+    box-shadow:
+      inset 0 0 30px rgba(56,189,248,0.05),
+      0 12px 30px rgba(0,0,0,0.28);
+
+    transition: 0.25s ease;
+  }
+
+  .jar-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .jar-card.selected {
+    border-color: #38bdf8;
+    box-shadow:
+      0 0 24px rgba(56,189,248,0.35),
+      inset 0 0 30px rgba(56,189,248,0.08);
   }
 
   .jar {
     position: relative;
-    height: 260px;
-    width: 90px;
+    height: 300px;
+    width: 110px;
     margin: auto;
-    border: 4px solid #94a3b8;
+
+    border: 5px solid rgba(203,213,225,0.95);
     border-top: none;
-    border-radius: 0 0 18px 18px;
+
+    border-radius: 0 0 22px 22px;
+
     overflow: hidden;
-    background: #111827;
+
+    background:
+      linear-gradient(
+        180deg,
+        rgba(15,23,42,0.95),
+        rgba(2,6,23,1)
+      );
+  }
+
+  .glass-shine {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    width: 16px;
+    height: 90%;
+    background: rgba(255,255,255,0.08);
+    border-radius: 999px;
+    z-index: 5;
   }
 
   .sugar {
     position: absolute;
     bottom: 0;
     width: 100%;
-    background: #facc15;
-    transition: height 0.3s ease;
+
+    background:
+      linear-gradient(
+        180deg,
+        #fde68a,
+        #facc15,
+        #eab308
+      );
+
+    transition: height 0.35s ease;
   }
 
   .marks {
@@ -75,44 +143,55 @@
   }
 
   .mark {
-    position: absolute;
-    left: 0;
-    width: 100%;
-    border-top: 1px solid rgba(255,255,255,0.35);
-    font-size: 0.65rem;
-    color: white;
-    text-align: right;
-    padding-right: 4px;
-  }
+  position: absolute;
+  left: 0;
+  width: 100%;
+
+  border-top: 2px solid rgba(255,255,255,0.65);
+
+  font-size: 0.68rem;
+  font-weight: bold;
+
+  color: #ffffff;
+
+  text-shadow:
+    0 0 3px rgba(0,0,0,0.9),
+    0 0 6px rgba(0,0,0,0.9);
+
+  text-align: right;
+
+  padding-right: 6px;
+
+  z-index: 6;
+}
 
   .jar-info {
-    margin-top: 12px;
+    margin-top: 16px;
+    font-size: 1.1rem;
     font-weight: bold;
     color: #f8fafc;
   }
 
   .jar-amount {
+    margin-top: 6px;
     color: #facc15;
-    margin-top: 5px;
-  }
-
-  .selected {
-    outline: 4px solid #38bdf8;
+    font-weight: bold;
   }
 
   button {
-    padding: 12px 16px;
-    margin: 6px;
+    padding: 12px 18px;
+    margin-top: 14px;
     border: none;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 0.95rem;
-  }
-
-  .select-btn {
+    border-radius: 999px;
     background: #38bdf8;
     color: #020617;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  button:hover {
+    transform: translateY(-2px);
   }
 
   .reset-btn {
@@ -124,6 +203,7 @@
     margin-top: 22px;
     min-height: 28px;
     font-weight: bold;
+    font-size: 1.02rem;
   }
 
   .success {
@@ -138,27 +218,32 @@
     color: #d1d5db;
   }
 
-  .move-log {
-    margin-top: 22px;
-    background: #020617;
-    border: 1px solid #334155;
-    border-radius: 14px;
-    padding: 14px;
-    max-height: 180px;
-    overflow-y: auto;
-    text-align: left;
-    color: #cbd5e1;
-    font-size: 0.9rem;
+
+  .next-btn {
+    display: none;
+    margin-top: 24px;
+    padding: 13px 24px;
+    border-radius: 999px;
+    background: #22c55e;
+    color: #020617;
+    font-weight: 900;
+    text-decoration: none;
   }
 
-  @media (max-width: 650px) {
+  @media (max-width: 700px) {
+
+    .game {
+      margin: 30px 10px;
+      padding: 16px;
+    }
+
     .jar-card {
-      width: 150px;
+      width: 170px;
     }
 
     .jar {
-      height: 220px;
-      width: 78px;
+      height: 240px;
+      width: 88px;
     }
   }
 </style>
@@ -166,29 +251,83 @@
 
 <body>
 
+<header class="site-header">
+
+  <div class="brand">
+
+    <div class="mini-logo">
+      <img src="../assets/game_logo.png" alt="IUSC Logo">
+    </div>
+
+    <div class="brand-text">
+      <small>Pubali Bank presents</small>
+      <strong>2nd IUSC National Science Fest 2026</strong>
+    </div>
+
+  </div>
+
+  <div class="header-badge">
+    Science Bingo
+  </div>
+
+</header>
+
 <div class="game">
+
   <h1>Sugar Jar Puzzle</h1>
 
   <p class="instructions">
-    You have three sugar jars with capacities of <strong>12g</strong>, <strong>8g</strong>, and <strong>5g</strong>.<br>
-    Initially, the 12g jar is full, and the other two jars are empty.<br>
-    Pour sugar from one jar to another until any jar contains exactly <strong>6g</strong>.
-  </p>
+  You have three sugar jars with capacities of
+  <strong>12g</strong>,
+  <strong>8g</strong>,
+  and
+  <strong>5g</strong>.<br><br>
+
+  Initially, the 12g jar is full while the others are empty.<br><br>
+
+  To pour sugar:
+  first select the source jar,
+  then select the destination jar.<br><br>
+
+  Sugar will automatically pour until:
+  the source jar becomes empty,
+  or the destination jar becomes full.<br><br>
+
+  Your goal is to make any jar contain exactly
+  <strong>6g</strong>.
+</p>
 
   <div class="jar-area" id="jarArea"></div>
 
-  <div style="margin-top: 22px;">
-    <button class="reset-btn" onclick="resetGame()">Reset</button>
+  <div style="margin-top: 24px;">
+    <button class="reset-btn" onclick="resetGame()">
+      Reset
+    </button>
   </div>
 
   <div class="message neutral" id="message">
     Select a source jar, then select a destination jar.
   </div>
 
-  <div class="move-log" id="moveLog">
-    <strong>Move Log</strong><br>
-  </div>
+
+
+ <div
+  id="nextBtn"
+  class="next-btn"
+  style="display:none;"
+>
+  I think you are good to go for the win.
 </div>
+
+</div>
+
+<footer class="site-footer">
+
+  <span>
+    Science Bingo | 2nd IUSC National Science Fest 2026
+  </span>
+
+</footer>
 
 <script>
   const jars = [
@@ -202,33 +341,50 @@
 
   const jarArea = document.getElementById("jarArea");
   const message = document.getElementById("message");
-  const moveLog = document.getElementById("moveLog");
+  const nextBtn = document.getElementById("nextBtn");
 
   function render() {
+
     jarArea.innerHTML = "";
 
     jars.forEach(jar => {
+
       const card = document.createElement("div");
+
       card.className = "jar-card";
 
       if (selectedJar === jar.id) {
         card.classList.add("selected");
       }
 
-      const fillPercent = (jar.amount / jar.capacity) * 100;
+      const fillPercent =
+        (jar.amount / jar.capacity) * 100;
 
       card.innerHTML = `
         <div class="jar">
-          <div class="sugar" style="height:${fillPercent}%"></div>
+
+          <div class="glass-shine"></div>
+
+          <div
+            class="sugar"
+            style="height:${fillPercent}%"
+          ></div>
+
           <div class="marks">
             ${createMarks(jar.capacity)}
           </div>
+
         </div>
 
-        <div class="jar-info">Jar ${jar.id} — ${jar.capacity}g</div>
-        <div class="jar-amount">Current: ${jar.amount}g</div>
+        <div class="jar-info">
+          ${jar.capacity}g Jar
+        </div>
 
-        <button class="select-btn" onclick="selectJar('${jar.id}')">
+        <div class="jar-amount">
+          Current: ${jar.amount}g
+        </div>
+
+        <button onclick="selectJar('${jar.id}')">
           Select
         </button>
       `;
@@ -238,13 +394,19 @@
   }
 
   function createMarks(capacity) {
+
     let html = "";
 
     for (let i = 1; i <= capacity; i++) {
-      const position = 100 - (i / capacity) * 100;
+
+      const position =
+        100 - (i / capacity) * 100;
 
       html += `
-        <div class="mark" style="top:${position}%">
+        <div
+          class="mark"
+          style="top:${position}%"
+        >
           ${i}
         </div>
       `;
@@ -254,50 +416,81 @@
   }
 
   function selectJar(id) {
+
     if (!selectedJar) {
+
       selectedJar = id;
-      showMessage(`Jar ${id} selected as source. Now choose destination.`, "neutral");
+
+      showMessage(
+        `Jar ${id} selected as source.`,
+        "neutral"
+      );
+
       render();
       return;
     }
 
     if (selectedJar === id) {
+
       selectedJar = null;
-      showMessage("Selection cleared.", "neutral");
+
+      showMessage(
+        "Selection cleared.",
+        "neutral"
+      );
+
       render();
       return;
     }
 
     pour(selectedJar, id);
+
     selectedJar = null;
+
     render();
+
     checkWin();
   }
 
   function pour(fromId, toId) {
-    const from = jars.find(j => j.id === fromId);
-    const to = jars.find(j => j.id === toId);
+
+    const from =
+      jars.find(j => j.id === fromId);
+
+    const to =
+      jars.find(j => j.id === toId);
 
     if (from.amount === 0) {
-      showMessage(`Jar ${fromId} is empty. Nothing to pour.`, "danger");
+
+      showMessage(
+        `Jar ${fromId} is empty.`,
+        "danger"
+      );
+
       return;
     }
 
     if (to.amount === to.capacity) {
-      showMessage(`Jar ${toId} is already full.`, "danger");
+
+      showMessage(
+        `Jar ${toId} is already full.`,
+        "danger"
+      );
+
       return;
     }
 
-    const availableSpace = to.capacity - to.amount;
-    const pouredAmount = Math.min(from.amount, availableSpace);
+    const availableSpace =
+      to.capacity - to.amount;
+
+    const pouredAmount =
+      Math.min(from.amount, availableSpace);
 
     from.amount -= pouredAmount;
     to.amount += pouredAmount;
+
     moves++;
 
-    moveLog.innerHTML += `
-      Move ${moves}: Poured ${pouredAmount}g from Jar ${fromId} to Jar ${toId}.<br>
-    `;
 
     showMessage(
       `Poured ${pouredAmount}g from Jar ${fromId} to Jar ${toId}.`,
@@ -305,18 +498,36 @@
     );
   }
 
+  function completeGame(text) {
+
+    localStorage.setItem(
+      "scienceBingo_math3_completed",
+      "true"
+    );
+
+    message.className =
+      "message success";
+
+    message.innerHTML = text;
+
+    nextBtn.style.display = "block";
+  }
+
   function checkWin() {
-    const solvedJar = jars.find(jar => jar.amount === 6);
+
+    const solvedJar =
+      jars.find(jar => jar.amount === 6);
 
     if (solvedJar) {
-      showMessage(
-        `Correct. Jar ${solvedJar.id} contains exactly 6g. Secret digit unlocked: 4`,
-        "success"
+
+      completeGame(
+        `Correct. Password revealed: <strong>win</strong>`
       );
     }
   }
 
   function resetGame() {
+
     jars[0].amount = 12;
     jars[1].amount = 0;
     jars[2].amount = 0;
@@ -324,15 +535,29 @@
     selectedJar = null;
     moves = 0;
 
-    moveLog.innerHTML = "<strong>Move Log</strong><br>";
+    showMessage(
+      "Game reset. Select a source jar first.",
+      "neutral"
+    );
 
-    showMessage("Game reset. Select a source jar, then destination jar.", "neutral");
     render();
   }
 
   function showMessage(text, type) {
-    message.className = `message ${type}`;
+
+    message.className =
+      `message ${type}`;
+
     message.textContent = text;
+  }
+
+  if (
+    localStorage.getItem(
+      "scienceBingo_math3_completed"
+    ) === "true"
+  ) {
+    nextBtn.style.display =
+      "inline-block";
   }
 
   render();

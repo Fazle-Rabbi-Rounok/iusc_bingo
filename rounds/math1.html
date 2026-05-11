@@ -2,28 +2,34 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Balance Box Puzzle</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balance Scale</title>
+
+<link rel="stylesheet" href="../css/style.css">
 
 <style>
   body {
     margin: 0;
+    padding: 0;
     font-family: Arial, sans-serif;
-    background: #111827;
     color: white;
-    padding: 20px;
     text-align: center;
   }
 
   .game {
-    max-width: 950px;
-    margin: auto;
-    background: #1f2937;
-    border-radius: 18px;
-    padding: 20px;
+    max-width: 980px;
+    margin: 40px auto;
+    padding: 24px;
+    border-radius: 26px;
+    border: 1px solid rgba(255,255,255,0.16);
+    background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+    box-shadow: 0 30px 80px rgba(0,0,0,0.35), 0 0 60px rgba(56,189,248,0.12);
+    backdrop-filter: blur(16px);
   }
 
   h1 {
     color: #38bdf8;
+    letter-spacing: 2px;
   }
 
   .instructions {
@@ -33,18 +39,21 @@
 
   .scale-area {
     display: grid;
-    grid-template-columns: 1fr 160px 1fr;
-    gap: 14px;
-    margin-top: 24px;
-    align-items: stretch;
+    grid-template-columns: 1fr 170px 1fr;
+    gap: 16px;
+    margin-top: 26px;
+  }
+
+  .pan, .scale-center, .box-pool, .escape-area {
+    background: rgba(2,6,23,0.86);
+    border: 1px solid rgba(148,163,184,0.35);
+    border-radius: 20px;
+    padding: 18px;
+    box-shadow: inset 0 0 30px rgba(56,189,248,0.05);
   }
 
   .pan {
     min-height: 260px;
-    background: #020617;
-    border: 2px solid #475569;
-    border-radius: 16px;
-    padding: 14px;
   }
 
   .pan h2 {
@@ -53,48 +62,48 @@
   }
 
   .scale-center {
-    background: #0f172a;
-    border: 2px solid #38bdf8;
-    border-radius: 16px;
-    padding: 14px;
     display: flex;
     flex-direction: column;
     justify-content: center;
   }
 
   .scale-symbol {
-    font-size: 3rem;
+    font-size: 3.4rem;
     margin-bottom: 12px;
   }
 
   .box-pool {
     margin-top: 25px;
-    background: #020617;
-    border: 1px solid #334155;
-    border-radius: 16px;
-    padding: 16px;
   }
 
   .boxes {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    margin-top: 14px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 16px;
   }
 
   .box-item {
-    background: #334155;
-    border: 1px solid #64748b;
-    border-radius: 12px;
-    padding: 14px 8px;
+    background: rgba(51,65,85,0.95);
+    border: 1px solid rgba(148,163,184,0.35);
+    border-radius: 16px;
+    padding: 16px 10px;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 900;
     user-select: none;
+    transition: 0.2s ease;
+  }
+
+  .box-item:hover {
+    transform: translateY(-2px);
+    border-color: #38bdf8;
   }
 
   .box-item.selected {
     background: #facc15;
     color: #020617;
+    border-color: #fde68a;
+    box-shadow: 0 0 20px rgba(250,204,21,0.35);
   }
 
   .box-item.used-left {
@@ -112,11 +121,11 @@
   }
 
   button {
-    padding: 12px 16px;
-    margin: 5px;
+    padding: 12px 18px;
+    margin: 6px;
     border: none;
-    border-radius: 10px;
-    font-weight: bold;
+    border-radius: 999px;
+    font-weight: 900;
     cursor: pointer;
     font-size: 0.95rem;
   }
@@ -149,16 +158,40 @@
   .pan-items {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
     justify-content: center;
   }
 
   .small-box {
     background: #1e293b;
     border: 1px solid #64748b;
-    border-radius: 10px;
-    padding: 10px;
-    font-weight: bold;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-weight: 900;
+  }
+
+  .escape-area {
+    margin-top: 24px;
+  }
+
+  .escape-area input {
+    padding: 12px;
+    width: 220px;
+    border: none;
+    border-radius: 8px;
+    text-align: center;
+    margin-right: 8px;
+  }
+
+  .next-btn {
+    display: none;
+    margin-top: 18px;
+    padding: 13px 24px;
+    border-radius: 999px;
+    background: #22c55e;
+    color: #020617;
+    font-weight: 900;
+    text-decoration: none;
   }
 
   .message {
@@ -167,19 +200,16 @@
     font-weight: bold;
   }
 
-  .success {
-    color: #22c55e;
-  }
-
-  .danger {
-    color: #f87171;
-  }
-
-  .neutral {
-    color: #d1d5db;
-  }
+  .success { color: #22c55e; }
+  .danger { color: #f87171; }
+  .neutral { color: #d1d5db; }
 
   @media (max-width: 750px) {
+    .game {
+      margin: 30px 10px;
+      padding: 16px;
+    }
+
     .scale-area {
       grid-template-columns: 1fr;
     }
@@ -187,20 +217,47 @@
     .boxes {
       grid-template-columns: repeat(2, 1fr);
     }
+
+    .escape-area input {
+      width: 180px;
+      margin-right: 0;
+    }
   }
 </style>
 </head>
 
 <body>
 
+<header class="site-header">
+  <div class="brand">
+    <div class="mini-logo">
+      <img src="../assets/game_logo.png" alt="IUSC Logo">
+    </div>
+
+    <div class="brand-text">
+      <small>Pubali Bank presents</small>
+      <strong>2nd IUSC National Science Fest 2026</strong>
+    </div>
+  </div>
+
+  <div class="header-badge">
+    Science Bingo
+  </div>
+</header>
+
 <div class="game">
-  <h1>Balance Box Puzzle</h1>
+  <h1>Balance Scale</h1>
 
   <p class="instructions">
-    There are 10 boxes with hidden weights between 10 kg and 50 kg.<br>
-    Select boxes and place them on the left or right side of the scale.<br>
-    Your goal is to make the two sides perfectly balanced.
-  </p>
+  Select weights and place them on the left or right side of the scale.<br>
+  You may also remove weights after placing them.<br><br>
+
+  After arranging the weights, press
+  <strong>Check Balance</strong>
+  to test the scale.<br><br>
+
+  Your goal is to make both sides perfectly balanced.
+</p>
 
   <div class="scale-area">
     <div class="pan">
@@ -220,8 +277,8 @@
   </div>
 
   <div class="box-pool">
-    <h2>Boxes</h2>
-    <p style="color:#94a3b8;">Tap a box, then choose where to place it.</p>
+    <h2>Weights</h2>
+    <p style="color:#94a3b8;">Tap a weight, then choose where to place it.</p>
 
     <div class="boxes" id="boxes"></div>
 
@@ -236,18 +293,34 @@
   </div>
 
   <div class="message" id="message"></div>
+
+  <div class="escape-area">
+    <p>Emergency escape</p>
+    <input type="text" id="escapeInput" placeholder="Emergency Password">
+    <button onclick="emergencyEscape()">Unlock</button>
+  </div>
+
+  <a id="nextBtn" href="math2.html" class="next-btn">
+    Let's go
+  </a>
 </div>
 
+<footer class="site-footer">
+  <span>
+    Science Bingo | 2nd IUSC National Science Fest 2026
+  </span>
+</footer>
+
 <script>
- const boxesData = [
-  { id: "A", weight: 11 },
-  { id: "B", weight: 12 },
-  { id: "C", weight: 14 },
-  { id: "D", weight: 16 },
-  { id: "E", weight: 21 },
-  { id: "F", weight: 22 },
-  { id: "G", weight: 26 },
-];
+  const boxesData = [
+    { id: "A", weight: 11 },
+    { id: "B", weight: 12 },
+    { id: "C", weight: 14 },
+    { id: "D", weight: 16 },
+    { id: "E", weight: 21 },
+    { id: "F", weight: 22 },
+    { id: "G", weight: 26 }
+  ];
 
   let placement = {};
   let selectedBox = null;
@@ -258,6 +331,7 @@
   const scaleStatus = document.getElementById("scaleStatus");
   const scaleSymbol = document.getElementById("scaleSymbol");
   const message = document.getElementById("message");
+  const nextBtn = document.getElementById("nextBtn");
 
   function initGame() {
     boxesData.forEach(box => {
@@ -266,7 +340,7 @@
 
     selectedBox = null;
     render();
-    showMessage("Select boxes and balance the scale.", "neutral");
+    showMessage("Select weights and balance the scale.", "neutral");
   }
 
   function render() {
@@ -278,30 +352,17 @@
       const div = document.createElement("div");
       div.className = "box-item";
 
-      if (selectedBox === box.id) {
-        div.classList.add("selected");
-      }
+      if (selectedBox === box.id) div.classList.add("selected");
+      if (placement[box.id] === "left") div.classList.add("used-left");
+      if (placement[box.id] === "right") div.classList.add("used-right");
 
-      if (placement[box.id] === "left") {
-        div.classList.add("used-left");
-      }
-
-      if (placement[box.id] === "right") {
-        div.classList.add("used-right");
-      }
-
-      div.textContent = `Box ${box.id} • ${box.weight} kg`;
+      div.textContent = `${box.weight} kg`;
       div.onclick = () => selectBox(box.id);
 
       boxesDiv.appendChild(div);
 
-      if (placement[box.id] === "left") {
-        addSmallBox(leftPan, box.id);
-      }
-
-      if (placement[box.id] === "right") {
-        addSmallBox(rightPan, box.id);
-      }
+      if (placement[box.id] === "left") addSmallBox(leftPan, box.id);
+      if (placement[box.id] === "right") addSmallBox(rightPan, box.id);
     });
 
     updateScalePreview();
@@ -311,7 +372,7 @@
     const div = document.createElement("div");
     div.className = "small-box";
     const box = boxesData.find(b => b.id === id);
-div.textContent = `${box.weight} kg`;
+    div.textContent = `${box.weight} kg`;
     container.appendChild(div);
   }
 
@@ -322,14 +383,14 @@ div.textContent = `${box.weight} kg`;
 
   function placeSelected(side) {
     if (!selectedBox) {
-      showMessage("Select a box first.", "danger");
+      showMessage("Select a weight first.", "danger");
       return;
     }
 
     placement[selectedBox] = side;
     selectedBox = null;
     render();
-    showMessage("Box moved.", "neutral");
+    showMessage("Weight moved.", "neutral");
   }
 
   function getTotal(side) {
@@ -339,43 +400,65 @@ div.textContent = `${box.weight} kg`;
   }
 
   function updateScalePreview() {
-    const leftTotal = getTotal("left");
-    const rightTotal = getTotal("right");
+  scaleSymbol.textContent = "⚖️";
+  scaleStatus.textContent = "Ready to check";
+}
 
-    if (leftTotal === 0 && rightTotal === 0) {
-      scaleSymbol.textContent = "⚖️";
-      scaleStatus.textContent = "Waiting...";
-      return;
-    }
-
-    if (leftTotal > rightTotal) {
-      scaleSymbol.textContent = "⬅️";
-      scaleStatus.textContent = "Left side is heavier";
-    } else if (rightTotal > leftTotal) {
-      scaleSymbol.textContent = "➡️";
-      scaleStatus.textContent = "Right side is heavier";
-    } else {
-      scaleSymbol.textContent = "⚖️";
-      scaleStatus.textContent = "Looks balanced";
-    }
+  function completeGame(text) {
+    localStorage.setItem("scienceBingo_math1_completed", "true");
+    message.className = "message success";
+    message.innerHTML = text;
+    nextBtn.style.display = "inline-block";
   }
 
   function checkBalance() {
-    const leftTotal = getTotal("left");
-    const rightTotal = getTotal("right");
+  const leftTotal = getTotal("left");
+  const rightTotal = getTotal("right");
 
-    if (leftTotal === 0 && rightTotal === 0) {
-      showMessage("Place some boxes first.", "danger");
-      return;
+  if (leftTotal === 0 && rightTotal === 0) {
+    showMessage("Place some weights first.", "danger");
+    return;
+  }
+
+  if (leftTotal === rightTotal) {
+
+    scaleSymbol.textContent = "⚖️";
+    scaleStatus.textContent =
+      `Balanced: ${leftTotal} kg`;
+
+    completeGame(
+      `Correct. Both sides are ${leftTotal} kg.`
+    );
+
+  } else {
+
+    if (leftTotal > rightTotal) {
+
+      scaleSymbol.textContent = "⬅️";
+      scaleStatus.textContent =
+        "Left pan is heavier";
+
+    } else {
+
+      scaleSymbol.textContent = "➡️";
+      scaleStatus.textContent =
+        "Right pan is heavier";
     }
 
-    if (leftTotal === rightTotal) {
-      showMessage(
-        `Correct. Both sides are ${leftTotal} kg. Secret digit unlocked: 7`,
-        "success"
-      );
+    showMessage(
+      "Not balanced yet. Try again.",
+      "danger"
+    );
+  }
+}
+
+  function emergencyEscape() {
+    const input = document.getElementById("escapeInput").value.trim().toLowerCase();
+
+    if (input === "business") {
+      completeGame("Emergency unlock accepted.");
     } else {
-      showMessage("Not balanced yet. Try again.", "danger");
+      showMessage("Incorrect emergency password.", "danger");
     }
   }
 
@@ -387,6 +470,10 @@ div.textContent = `${box.weight} kg`;
   function showMessage(text, type) {
     message.className = `message ${type}`;
     message.textContent = text;
+  }
+
+  if (localStorage.getItem("scienceBingo_math1_completed") === "true") {
+    nextBtn.style.display = "inline-block";
   }
 
   initGame();

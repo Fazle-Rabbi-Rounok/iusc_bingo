@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Science Bingo Completed</title>
+
+<link rel="stylesheet" href="../css/style.css">
+
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-family: Arial, sans-serif;
+    color: white;
+    text-align: center;
+  }
+
+  .winner-page {
+    min-height: calc(100vh - 160px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px 20px;
+  }
+
+  .winner-card {
+
+    max-width: 950px;
+
+    padding: 50px 30px;
+
+    border-radius: 34px;
+
+    border: 1px solid rgba(255,255,255,0.18);
+
+    background:
+      linear-gradient(
+        145deg,
+        rgba(255,255,255,0.14),
+        rgba(255,255,255,0.04)
+      );
+
+    box-shadow:
+      0 40px 120px rgba(0,0,0,0.42),
+      0 0 80px rgba(56,189,248,0.14);
+
+    backdrop-filter: blur(18px);
+
+    animation: glow 3s infinite alternate;
+  }
+
+  @keyframes glow {
+    from {
+      box-shadow:
+        0 40px 120px rgba(0,0,0,0.42),
+        0 0 40px rgba(56,189,248,0.10);
+    }
+
+    to {
+      box-shadow:
+        0 40px 120px rgba(0,0,0,0.42),
+        0 0 90px rgba(56,189,248,0.22);
+    }
+  }
+
+  .winner-card h1 {
+    font-size: clamp(2.8rem, 7vw, 6rem);
+
+    margin-bottom: 22px;
+
+    letter-spacing: 6px;
+
+    background:
+      linear-gradient(
+        90deg,
+        #ffffff,
+        #bae6fd,
+        #c4b5fd
+      );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    color: transparent;
+  }
+
+  .winner-card h2 {
+    color: #86efac;
+
+    font-size: clamp(1.3rem, 3vw, 2rem);
+
+    margin-bottom: 28px;
+  }
+
+  .winner-card p {
+    color: #d1d5db;
+
+    line-height: 2;
+
+    font-size: 1.1rem;
+
+    max-width: 760px;
+
+    margin: auto;
+  }
+
+  .sparkles {
+    font-size: 2rem;
+    margin-bottom: 16px;
+  }
+
+  .badge {
+    margin-top: 34px;
+
+    display: inline-block;
+
+    padding: 14px 26px;
+
+    border-radius: 999px;
+
+    background:
+      linear-gradient(
+        90deg,
+        #22c55e,
+        #38bdf8
+      );
+
+    color: #020617;
+
+    font-weight: 900;
+
+    letter-spacing: 2px;
+  }
+
+  @media (max-width: 650px) {
+
+    .winner-card {
+      padding: 36px 20px;
+    }
+
+    .winner-card h1 {
+      letter-spacing: 3px;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<header class="site-header">
+
+  <div class="brand">
+
+    <div class="mini-logo">
+      <img src="../assets/game_logo.png" alt="IUSC Logo">
+    </div>
+
+    <div class="brand-text">
+      <small>Pubali Bank presents</small>
+      <strong>2nd IUSC National Science Fest 2026</strong>
+    </div>
+
+  </div>
+
+  <div class="header-badge">
+    Science Bingo
+  </div>
+
+</header>
+
+<main class="winner-page">
+
+  <div class="winner-card">
+
+    <div class="sparkles">
+      ✨ 🧠 ✨
+    </div>
+
+    <h1>CONGRATULATIONS</h1>
+
+    <h2>
+      YOU HAVE COMPLETED SCIENCE BINGO
+    </h2>
+
+    <p>
+      Through logic, observation, memory,
+      timing, mathematics, and problem solving,
+      you successfully completed every challenge
+      and unlocked the final password.<br><br>
+
+      Your journey through
+      The Pathways,
+      The Mirror,
+      The River,
+      and
+      The Numbers
+      is now complete.
+    </p>
+
+    <div class="badge">
+      SCIENCE BINGO MASTER
+    </div>
+
+  </div>
+
+</main>
+
+<footer class="site-footer">
+
+  <span>
+    Science Bingo | 2nd IUSC National Science Fest 2026
+  </span>
+
+</footer>
+
+</body>
+</html>
