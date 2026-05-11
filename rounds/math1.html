@@ -411,38 +411,40 @@
     nextBtn.style.display = "inline-block";
   }
 
-  function checkBalance() {
+ function checkBalance() {
   const leftTotal = getTotal("left");
   const rightTotal = getTotal("right");
 
-  if (leftTotal === 0 && rightTotal === 0) {
-    showMessage("Place some weights first.", "danger");
+  const allUsed = boxesData.every(
+    box => placement[box.id] === "left" || placement[box.id] === "right"
+  );
+
+  if (!allUsed) {
+    scaleSymbol.textContent = "⚠️";
+    scaleStatus.textContent = "Use all weights first";
+
+    showMessage(
+      "Every weight must be placed before checking.",
+      "danger"
+    );
     return;
   }
 
   if (leftTotal === rightTotal) {
-
     scaleSymbol.textContent = "⚖️";
-    scaleStatus.textContent =
-      `Balanced: ${leftTotal} kg`;
+    scaleStatus.textContent = `Balanced: ${leftTotal} kg`;
 
     completeGame(
-      `Correct. Both sides are ${leftTotal} kg.`
+      `Correct. All weights used and both sides are ${leftTotal} kg.`
     );
 
   } else {
-
     if (leftTotal > rightTotal) {
-
       scaleSymbol.textContent = "⬅️";
-      scaleStatus.textContent =
-        "Left pan is heavier";
-
+      scaleStatus.textContent = "Left pan is heavier";
     } else {
-
       scaleSymbol.textContent = "➡️";
-      scaleStatus.textContent =
-        "Right pan is heavier";
+      scaleStatus.textContent = "Right pan is heavier";
     }
 
     showMessage(
